@@ -54,7 +54,7 @@ PrefabInstance:
       objectReference: {fileID: -876546973899608171, guid: 2aebb72637d679b449ca6176efa96112, type: 3}
     - target: {fileID: 919132149155446097, guid: 1bb8cb58d29286a41a1dfc4be7d85ec0, type: 3}
       propertyPath: m_Name
-      value: Rift
+      value: RiftPrefab
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

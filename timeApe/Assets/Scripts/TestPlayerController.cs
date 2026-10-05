@@ -6,7 +6,7 @@ using FMODUnity;
 using System.Dynamic;
 
 [RequireComponent(typeof(CharacterController))]
-public class ThirdPersonController : MonoBehaviour
+public class TestThirdPersonController : MonoBehaviour
 {
     #region Variables
     [Header("Camera")]
@@ -50,7 +50,7 @@ public class ThirdPersonController : MonoBehaviour
     public float rollDash = 25f;
     public float rollDuration = 0.2f;
 
-
+    /*
     [Header("Audio Stuff")]
     public GameObject Player;
     FMOD.Studio.EventInstance FootstepsSound;
@@ -73,7 +73,7 @@ public class ThirdPersonController : MonoBehaviour
     [SerializeField] EventReference RollEvent;
     FMOD.Studio.EventInstance RollSound;
     private float RollTime = 0f;
-
+    */
 
     //private variables
     private bool isSkidding;
@@ -111,7 +111,7 @@ public class ThirdPersonController : MonoBehaviour
     private Vector2 moveInput;
     private Vector2 lookInput;
     private Vector2 previousStick = Vector2.zero;
-    private Vector3 velocity;
+    static public Vector3 velocity;
     private Vector3 moveDirection;
     private Vector3 lastMoveDirection;
     private Vector3 launchDirection;
@@ -129,6 +129,7 @@ public class ThirdPersonController : MonoBehaviour
         controller = GetComponent<CharacterController>(); //Start taking information from controller input
         inputActions = new PlayerInput();
 
+        /*
         //audio variables
         FootstepsSound = FMODUnity.RuntimeManager.CreateInstance(FootstepEvent);
         JumpSound = FMODUnity.RuntimeManager.CreateInstance(JumpEvent);
@@ -136,6 +137,7 @@ public class ThirdPersonController : MonoBehaviour
         SkidSound = FMODUnity.RuntimeManager.CreateInstance(SkidEvent);
         RollSound = FMODUnity.RuntimeManager.CreateInstance(RollEvent);
         Debug.Log(spinTimeout);
+        */
     }
 
     void OnEnable()
@@ -183,7 +185,7 @@ public class ThirdPersonController : MonoBehaviour
         RotateCamera();
         RotateModel();
         Roll();
-        AudioChecks();
+        //AudioChecks();
 
         //Makes movement obey deadzones
         if (moveInput.magnitude > deadZone)
@@ -598,6 +600,8 @@ public class ThirdPersonController : MonoBehaviour
     /*
          --------------------------------------- AUDIO FUNCTIONS ----------------------------------------------------------------------------------
          */
+
+    /*
     void AudioChecks() //contains all the checks for movement sounds
     {
         StepTime += Time.deltaTime;
@@ -670,5 +674,6 @@ public class ThirdPersonController : MonoBehaviour
             RollSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         }
     }
+    */
     #endregion
 }

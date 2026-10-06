@@ -43,8 +43,9 @@ public class TestThirdPersonController : MonoBehaviour
 
     [Header("Spin")]
     public float jumpSpinHeight = 20f;
-    public float spinAngleTrigger = 720f;
+    public static float spinAngleTrigger = 360f;
     public float spinTimeout = 0.20f;
+    public static float angleDelta = 0f;
 
     [Header("Roll")]
     public float rollDash = 25f;
@@ -80,7 +81,7 @@ public class TestThirdPersonController : MonoBehaviour
     private bool jumped;
     private bool jumpHold;
     private bool walker;
-    private bool isSpinning = false;
+    public static bool isSpinning = false;
     private bool isBackflipping;
     private bool movementBlocked;
     private bool isTouchingWall;
@@ -94,7 +95,7 @@ public class TestThirdPersonController : MonoBehaviour
 
     private float verticalLookRotation;
     private float speed;
-    private float rotationCheck = 0f;
+    public static float rotationCheck = 0f;
     private float spinCooldownTimer = 0f;
     private float clockoyote = 0f;
     private float skidTimer;
@@ -102,15 +103,15 @@ public class TestThirdPersonController : MonoBehaviour
     private float midSpeed;
     private float rollTimer = 0f;
 
-    private int spinDirection = 0;
+    public static int spinDirection = 0;
 
     private CharacterController controller;
 
     private PlayerInput inputActions;
 
-    private Vector2 moveInput;
+    public static Vector2 moveInput;
     private Vector2 lookInput;
-    private Vector2 previousStick = Vector2.zero;
+    public static Vector2 previousStick = Vector2.zero;
     static public Vector3 velocity;
     private Vector3 moveDirection;
     private Vector3 lastMoveDirection;
@@ -318,18 +319,21 @@ public class TestThirdPersonController : MonoBehaviour
 
     void ApplyGravity() //HANDLES VERTICAL SPEED
     {
+        
         //this resets vertical speed when a player collides with a ceiling
         CollisionFlags flags = controller.Move(velocity * Time.deltaTime * 2f);
+        
         if ((flags & CollisionFlags.Above) != 0 && velocity.y > 0)
         {
             velocity.y = 0f;
             movementBlockTimer = 0f; //interrupts special jumps if a wall is hit
         }
+        
 
         //this maintains the player grounded
-        if (controller.isGrounded && velocity.y < 0)
+        if (controller.isGrounded)
         {
-            velocity.y = -2f;
+            velocity.y = 0f;
             jumped = false;
         }
 
@@ -410,7 +414,6 @@ public class TestThirdPersonController : MonoBehaviour
         {
             if (moveInput.magnitude < 0.7f) //resets spin detection if rotation isn't fast enough
             {
-                Debug.Log(moveInput.magnitude);
                 previousStick = Vector2.zero;
                 rotationCheck = 0f;
                 spinDirection = 0;
@@ -421,8 +424,8 @@ public class TestThirdPersonController : MonoBehaviour
 
             if (previousStick != Vector2.zero) //detects when player is moving joystick
             {
-                float angleDelta = Vector2.SignedAngle(previousStick, moveInput); //storing spin angle
-                Debug.Log($"Move stick: {moveInput} and Previous stick: {previousStick} and angeDelta: {angleDelta}");
+                angleDelta = Vector2.SignedAngle(previousStick, moveInput); //storing spin angle
+                Debug.Log($"AngeDelta: {angleDelta}");
 
                 if (Mathf.Abs(angleDelta) > 2f)
                 {
@@ -435,10 +438,10 @@ public class TestThirdPersonController : MonoBehaviour
                         spinAudioCheck = true;
                     }
 
-                    if (currentDirection == spinDirection) //checks if the joystick goes to the same direction, if it does, add to the spin charge
-                    {
-                        rotationCheck += Mathf.Abs(angleDelta); //this is the spin you see I think????
-                        Debug.Log($"Rotation check is: {rotationCheck}");
+                    if (currentDirection >= spinDirection) //checks if the joystick goes to the same direction, 
+                    {                                      //if it does, add to the spin charge
+                        rotationCheck += Mathf.Abs(angleDelta); 
+                        //Debug.Log($"Rotation check is: {rotationCheck}");
                         
                     }
                     else //if not reset the charge
@@ -462,9 +465,11 @@ public class TestThirdPersonController : MonoBehaviour
                     rotationCheck = 0;
                 }
 
-                if ((rotationCheck) >= spinAngleTrigger)
+                if ((rotationCheck) >= spinAngleTrigger) //player has to basically do two full spins??
                 {
                     isSpinning = true;
+                    //this.transform.rotation = Quaternion.AngleAxis(70f, Vector3.up);
+                    //Debug.Log("You are now spinning");
                 }
             }
             previousStick = moveInput;
@@ -484,8 +489,7 @@ public class TestThirdPersonController : MonoBehaviour
         verticalLookRotation -= mouseY;
         verticalLookRotation = Mathf.Clamp(verticalLookRotation, -70f, 70f);
 
-        cameraTransform.localRotation =
-            Quaternion.Euler(verticalLookRotation, 0f, 0f);
+        cameraTransform.localRotation = Quaternion.Euler(verticalLookRotation, 0f, 0f);
     }
 
 

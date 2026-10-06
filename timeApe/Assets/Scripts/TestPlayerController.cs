@@ -410,6 +410,7 @@ public class TestThirdPersonController : MonoBehaviour
         {
             if (moveInput.magnitude < 0.7f) //resets spin detection if rotation isn't fast enough
             {
+                Debug.Log(moveInput.magnitude);
                 previousStick = Vector2.zero;
                 rotationCheck = 0f;
                 spinDirection = 0;
@@ -421,12 +422,13 @@ public class TestThirdPersonController : MonoBehaviour
             if (previousStick != Vector2.zero) //detects when player is moving joystick
             {
                 float angleDelta = Vector2.SignedAngle(previousStick, moveInput); //storing spin angle
+                Debug.Log($"Move stick: {moveInput} and Previous stick: {previousStick} and angeDelta: {angleDelta}");
 
                 if (Mathf.Abs(angleDelta) > 2f)
                 {
-                    int currentDirection = angleDelta > 0 ? 1 : -1;
+                    int currentDirection = angleDelta > 0 ? 1 : -1; //ternary statement, returns 1 or -1; simple if statement
 
-                    if (spinDirection == 0) //detects beginning of spin
+                    if (spinDirection == 0) //detects beginning of spin, there is a reason it was initialized at 0 
                     {
                         spinDirection = currentDirection;
                         spinCooldownTimer = spinTimeout;
@@ -435,7 +437,9 @@ public class TestThirdPersonController : MonoBehaviour
 
                     if (currentDirection == spinDirection) //checks if the joystick goes to the same direction, if it does, add to the spin charge
                     {
-                        rotationCheck += Mathf.Abs(angleDelta);
+                        rotationCheck += Mathf.Abs(angleDelta); //this is the spin you see I think????
+                        Debug.Log($"Rotation check is: {rotationCheck}");
+                        
                     }
                     else //if not reset the charge
                     {

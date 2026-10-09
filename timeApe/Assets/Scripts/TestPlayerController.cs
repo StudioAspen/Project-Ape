@@ -38,6 +38,10 @@ public class TestThirdPersonController : MonoBehaviour
     public float slowSpeed = 1f;
     public float rotationSpeed = 10f;
     public float modelRotateSpeed = 10f;
+    public static Vector2 moveInput;
+    public static Vector2 previousStick = Vector2.zero;
+
+
     [Space(10)] //skid variables
     public float skidTolerance = -0.7f;
     public float skidDuration = 0.2f;
@@ -45,9 +49,9 @@ public class TestThirdPersonController : MonoBehaviour
 
     [Header("Spin")]
     public float jumpSpinHeight = 20f;
-    public static float spinAngleTrigger = 540f;
+    public static float spinAngleTrigger = 900f;
     public static float stickSpeed = 0f;
-    public float spinTimeout = 0.20f;
+    //public float spinTimeout = 0.20f;
     public static float angleDelta = 0f;
 
     [Header("Roll")]
@@ -85,7 +89,7 @@ public class TestThirdPersonController : MonoBehaviour
     private bool jumpHold;
     private bool walker;
     public static bool isSpinning;
-    private bool canStartSpinCheck = true;
+    public static bool wasSpinning;
     private bool isBackflipping;
     private bool movementBlocked;
     private bool isTouchingWall;
@@ -95,12 +99,14 @@ public class TestThirdPersonController : MonoBehaviour
     private bool jumpAudioCheck;
     private bool spinAudioCheck;
     private bool Airlock;
-    private float newRotationCheck = 0f;
-    private bool spinningConditionMet = false;
+    
+    private bool spinningConditionMet;
     private bool rollState;
 
     private float verticalLookRotation;
     private float speed;
+    public static float newRotationCheck = 0f;
+    private float stickDistanceInputs = 0f;
     public static float rotationCheck = 0f;
     public static float spinCooldownTimer = 2f;
     public static float spinStateTimer = 4f;
@@ -109,19 +115,16 @@ public class TestThirdPersonController : MonoBehaviour
     private float movementBlockTimer;
     private float midSpeed;
     private float rollTimer = 0f;
+    public static float testTimer = 0f;
 
-    public static int currentDirection = 0;
     public static int spinDirection = 0;
 
     private CharacterController controller;
 
     private PlayerInput inputActions;
 
-    public static Vector2 moveInput;
     private Vector2 lookInput;
-    public static Vector2 previousStick = Vector2.zero;
-    static public Vector3 velocity;
-    static public Vector3 previousVelocity = Vector3.zero;
+    public static Vector3 velocity;
     private Vector3 moveDirection;
     private Vector3 lastMoveDirection;
     private Vector3 launchDirection;
@@ -382,7 +385,7 @@ public class TestThirdPersonController : MonoBehaviour
         {
 
             //SPIN JUMP (only in ground and needs to be spinning)
-            if (isSpinning && controller.isGrounded)
+            if (isSpinning)
             {
                 velocity.y = Mathf.Sqrt(jumpSpinHeight * -2f * gravity);
                 jumped = true;
@@ -422,53 +425,60 @@ public class TestThirdPersonController : MonoBehaviour
         if (controller.isGrounded)
         {
             angleDelta = Vector2.SignedAngle(previousStick, moveInput); //storing spin angle
-            stickSpeed = Vector2.Distance(moveInput, previousStick);
+            stickDistanceInputs = Vector2.Distance(moveInput, previousStick); //storing spin speed
 
             rotationCheck += Mathf.Abs(angleDelta);
+            stickSpeed += stickDistanceInputs; 
 
-            if (rotationCheck > spinAngleTrigger && !spinningConditionMet)
-            {
-                newRotationCheck = rotationCheck;
-                spinningConditionMet = true;
-                Debug.Log(newRotationCheck);
-            }
-
-            if (newRotationCheck > spinAngleTrigger)
+            if (rotationCheck > spinAngleTrigger && stickSpeed > 30f)
             {
                 isSpinning = true;
+            }
+
+            if (isSpinning)
+            {
                 spinStateTimer -= Time.deltaTime;
             }
 
-            if (previousStick.sqrMagnitude < 0.1f)
+            //Everything below is what cancels the spin state and/or its check(s)
+
+            if (moveInput.sqrMagnitude < 0.9f) //if player isn't giving enough input reset entire state
             {
                 previousStick = Vector2.zero;
                 isSpinning = false;
                 spinStateTimer = 4f;
                 rotationCheck = 0f;
-                spinningConditionMet = false;
+                stickSpeed = 0f;
             }
 
-            if (spinStateTimer <= 0f)
+            else if (moveInput.sqrMagnitude > 0.9f && !isSpinning) //check that runs every 1.25 seconds that resets the spin check
             {
-                previousStick = Vector2.zero;
-                isSpinning = false;
-                spinStateTimer = 4f;
-                rotationCheck = 0f;
-                spinningConditionMet = false;
-            }
+                testTimer += Time.deltaTime;
 
-            /*
-            if (!previousGrounded && !isSpinning)
-            {
-                spinCooldownTimer -= Time.deltaTime;
-
-                if (spinCooldownTimer < 0f)
+                if (testTimer > 1.25f)
                 {
-                    canStartSpinCheck = true;
+                    rotationCheck = 0f;
+                    stickSpeed = 0f;
+                    testTimer = 0f;
                 }
             }
-            */
-            previousStick = moveInput;
+
+            if (spinStateTimer <= 0f) //reset spin state if timer = zero
+            {
+                isSpinning = false;
+                spinStateTimer = 4f;
+                rotationCheck = 0f;
+                stickSpeed = 0f;
+            }
+            
+            if (wasSpinning) //prevents check from continuing after finishing spin, resets check as mentioned above
+            {
+                rotationCheck = 0f;
+                stickSpeed = 0f;
+            }
+
+            previousStick = moveInput; //these are left at the very end of this function block to get previous state
+            wasSpinning = isSpinning;
         }
     }
 
@@ -491,12 +501,14 @@ public class TestThirdPersonController : MonoBehaviour
 
     void RotateModel() //RESPONSIBLE OF ROTATING THE MODEL ACCORDING TO THE DIRECTION THE PLAYER IS MOVING
     {
+
         if (moveDirection.magnitude > 0.1f && !isBackflipping) //Moves only when joystick is tilted OR blocks when the player is doing a backflip
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
 
             modelTransform.rotation = Quaternion.Slerp(modelTransform.rotation, targetRotation, modelRotateSpeed * Time.deltaTime);
         }
+        
     }
 
 

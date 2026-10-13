@@ -116,6 +116,8 @@ public class ThirdPersonController : MonoBehaviour
     private Vector3 lastMoveDirection;
     private Vector3 launchDirection;
     private Vector3 rollDirection;
+
+    private Vector3 startPos; //added
     #endregion
 
 
@@ -136,6 +138,8 @@ public class ThirdPersonController : MonoBehaviour
         SkidSound = FMODUnity.RuntimeManager.CreateInstance(SkidEvent);
         RollSound = FMODUnity.RuntimeManager.CreateInstance(RollEvent);
         Debug.Log(spinTimeout);
+
+        startPos = transform.position; //added
     }
 
     void OnEnable()
@@ -224,6 +228,12 @@ public class ThirdPersonController : MonoBehaviour
         }
 
         DetectSpin();
+
+        if(transform.position.y < -120f) //added for death and respawn
+        {
+            transform.position = startPos;
+            velocity = Vector3.zero;
+        }
     }
     #endregion
 

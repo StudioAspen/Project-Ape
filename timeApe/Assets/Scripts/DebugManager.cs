@@ -41,13 +41,15 @@ public class DebugManager : MonoBehaviour
                 $"Angle between current input \n" +
                 $"and previous input: {Mathf.Round(Mathf.Abs(TestThirdPersonController.angleDelta)),0} \n" +
                 $"Current input: {TestThirdPersonController.moveInput} \n" +
+                $"Current input magnitude/length: {TestThirdPersonController.moveInput.sqrMagnitude} \n" +
                 $"Previous input: {TestThirdPersonController.previousStick} \n" +
                 $"Rotation check: {Mathf.Round(TestThirdPersonController.rotationCheck),0} \n" +
                 $"Stick speed: {Mathf.Round(TestThirdPersonController.stickSpeed),0} \n" +
                 $"Spin state trigger angle: {TestThirdPersonController.spinAngleTrigger} \n" +
                 $"Is player spinning: {TestThirdPersonController.isSpinning} \n" +
                 $"Was player spinning: {TestThirdPersonController.wasSpinning} \n" +
-                $"Reset spin timer: {Mathf.Round(TestThirdPersonController.testTimer),2} \n" +
+                $"Reset spin timer: {TestThirdPersonController.testTimer} \n" +
+                $"Hold timer: {TestThirdPersonController.holdtimer} \n" +
                 $"Spin state length timer: {Mathf.Round(TestThirdPersonController.spinStateTimer),0} ";
             
         return;

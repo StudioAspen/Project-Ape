@@ -116,6 +116,7 @@ public class TestThirdPersonController : MonoBehaviour
     private float midSpeed;
     private float rollTimer = 0f;
     public static float testTimer = 0f;
+    public static float holdtimer = 0f;
 
     public static int spinDirection = 0;
 
@@ -424,13 +425,35 @@ public class TestThirdPersonController : MonoBehaviour
     {
         if (controller.isGrounded)
         {
+            if (moveInput.sqrMagnitude >= 0.9f)
+            {
+                stickDistanceInputs = Vector2.Distance(moveInput, previousStick) / Time.deltaTime; //storing spin speed
+            }
             angleDelta = Vector2.SignedAngle(previousStick, moveInput); //storing spin angle
-            stickDistanceInputs = Vector2.Distance(moveInput, previousStick); //storing spin speed
 
-            rotationCheck += Mathf.Abs(angleDelta);
-            stickSpeed += stickDistanceInputs; 
+            if (Mathf.Abs(angleDelta) > 2f)
+            {
+                int currentDirection = angleDelta > 0 ? 1 : -1;
 
-            if (rotationCheck > spinAngleTrigger && stickSpeed > 30f)
+                if (spinDirection == 0) //detects beginning of spin
+                {
+                    spinDirection = currentDirection;
+                }
+
+                if (currentDirection == spinDirection) //checks if the joystick goes to the same direction, if it does, add to the spin charge
+                {
+                    rotationCheck += Mathf.Abs(angleDelta);
+                    stickSpeed = stickDistanceInputs;
+                }
+                else //if not reset the charge
+                {
+                    rotationCheck = 0f;
+                    stickSpeed = 0f;
+                    spinDirection = currentDirection;
+                }
+            }
+
+            if (rotationCheck >= spinAngleTrigger && stickSpeed > 500f)
             {
                 isSpinning = true;
             }
@@ -451,16 +474,19 @@ public class TestThirdPersonController : MonoBehaviour
                 stickSpeed = 0f;
             }
 
-            else if (moveInput.sqrMagnitude > 0.9f && !isSpinning) //check that runs every 1.25 seconds that resets the spin check
+            else if (moveInput.sqrMagnitude > 0.9f && !isSpinning && rotationCheck > spinAngleTrigger) //check that runs every 1.25 seconds that resets the spin check
             {
-                testTimer += Time.deltaTime;
+                /*testTimer += Time.deltaTime;
 
-                if (testTimer > 1.25f)
+                if (testTimer > 0.2f)
                 {
                     rotationCheck = 0f;
                     stickSpeed = 0f;
                     testTimer = 0f;
-                }
+                }*/
+                rotationCheck = 0f;
+                stickSpeed = 0f;
+                testTimer = 0f;
             }
 
             if (spinStateTimer <= 0f) //reset spin state if timer = zero

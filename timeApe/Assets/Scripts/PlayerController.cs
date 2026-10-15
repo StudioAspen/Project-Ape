@@ -50,6 +50,17 @@ public class ThirdPersonController : MonoBehaviour
     public float rollDash = 25f;
     public float rollDuration = 0.2f;
 
+    [Header("Combat")]
+    public GameObject TempSpear;
+    public Transform attackPoint;
+    private InputAction m_throw;
+    public float throwCooldown;
+    public float throwForce;
+    public float throwUpwardForce;
+
+    bool readyToThrow;
+   
+
 
     [Header("Audio Stuff")]
     public GameObject Player;
@@ -126,8 +137,10 @@ public class ThirdPersonController : MonoBehaviour
 
     void Awake()
     {
+        readyToThrow = true; //throw is ready at the start
         controller = GetComponent<CharacterController>(); //Start taking information from controller input
         inputActions = new PlayerInput();
+        m_throw = InputSystem.actions.FindAction("Throw");
 
         //audio variables
         FootstepsSound = FMODUnity.RuntimeManager.CreateInstance(FootstepEvent);
@@ -170,6 +183,8 @@ public class ThirdPersonController : MonoBehaviour
         {
             RollDetect();
         };
+        
+        
 
     }
 
@@ -221,6 +236,11 @@ public class ThirdPersonController : MonoBehaviour
         if (!controller.isGrounded) //checks for walls while jumping, no need to check them during ground state.
         {
             CheckWall();
+        }
+
+        if(m_throw.WasPressedThisFrame() && readyToThrow) // throws spear
+        {
+            Attack();
         }
 
         DetectSpin();
@@ -591,6 +611,27 @@ public class ThirdPersonController : MonoBehaviour
             velocity.z = 0f;
             Airlock = true;
         }
+    }
+
+    private void Attack() // SHOOTS SPEAR
+    {
+
+        readyToThrow = false; //so it cannot be spammed
+
+        GameObject spear = Instantiate(TempSpear, attackPoint.position, cameraTransform.rotation); //this is what creates the spear at the attackpoint
+
+        Rigidbody spearRb = spear.GetComponent<Rigidbody>(); //this grabs the rigidbody component of the spear
+
+        Vector3 forceToAdd = cameraTransform.transform.forward * throwForce + transform.up * throwUpwardForce; //force for the spear's rigidbody
+
+        spearRb.AddForce(forceToAdd, ForceMode.Impulse); //applies spear force
+
+        Invoke(nameof(ResetThrow), throwCooldown); // starts resetthrow function in whatever time is set for throwcooldown
+    }
+
+    private void ResetThrow() //resets the throw
+    {
+        readyToThrow = true;
     }
     #endregion
 

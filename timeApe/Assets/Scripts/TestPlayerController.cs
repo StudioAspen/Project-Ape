@@ -1,0 +1,717 @@
+﻿using JetBrains.Annotations;
+using System.Dynamic;
+using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.ProBuilder.Shapes;
+using UnityEngine.Rendering;
+
+[RequireComponent(typeof(CharacterController))]
+public class TestThirdPersonController : MonoBehaviour
+{
+    #region Variables
+    [Header("Camera")]
+    public Transform cameraTransform; //The Camera pivot goes here in editor
+
+    [Header("Jumping")]
+    public float coyoteTimer = 0.2f;
+    public float gravity = -90f;
+    public float jumpHeight = 10f;
+    public float jumpRelease = 2.5f;
+    [Space(10)] //backflip variables
+    public float backflipSpeed = 10f;
+    public float backflipHeight = 10f;
+    [Space(10)] //walljump variables
+    public float groundCheckDistance = 2f;
+    public float wallCheckDistance = 0.7f;
+    public float wallJumpLock = 0.2f;
+    public float wallJumpHorizontal = 10f;
+    public float wallJumpVertical = 10f;
+
+    [Header("Movement")]
+    public Transform modelTransform; //The Character Model Goes here in the editor
+    public float acceleration = 40f;
+    public float blockedTimer = 1f;
+    public float deadZone = 0.4f;
+    public float fastSpeed = 20f;
+    public float slowSpeed = 1f;
+    public float rotationSpeed = 10f;
+    public float modelRotateSpeed = 10f;
+    public static Vector2 moveInput;
+    public static Vector2 previousStick = Vector2.zero;
+
+
+    [Space(10)] //skid variables
+    public float skidTolerance = -0.7f;
+    public float skidDuration = 0.2f;
+    public float skidDeceleration = 30f;
+
+    [Header("Spin")]
+    public float jumpSpinHeight = 20f;
+    public static float spinAngleTrigger = 900;
+    public static float stickSpeed = 0f;
+    //public float spinTimeout = 0.20f;
+    public static float angleDelta = 0f;
+
+    [Header("Roll")]
+    public float rollDash = 25f;
+    public float rollDuration = 0.2f;
+
+    /*
+    [Header("Audio Stuff")]
+    public GameObject Player;
+    FMOD.Studio.EventInstance FootstepsSound;
+    [SerializeField] EventReference FootstepEvent;
+    public float FootstepRate = .4f;
+    private float StepTime = 0f;
+
+
+    [SerializeField] EventReference JumpEvent;
+    FMOD.Studio.EventInstance JumpSound;
+
+
+    [SerializeField] EventReference SpinEvent;
+    FMOD.Studio.EventInstance SpinSound;
+
+    [SerializeField] EventReference SkidEvent;
+    FMOD.Studio.EventInstance SkidSound;
+    private float skidTime = 0f;
+
+    [SerializeField] EventReference RollEvent;
+    FMOD.Studio.EventInstance RollSound;
+    private float RollTime = 0f;
+    */
+
+    //private variables
+    private bool isSkidding;
+    private bool jumped;
+    private bool jumpHold;
+    private bool walker;
+    public static bool isSpinning;
+    public static bool wasSpinning;
+    private bool isBackflipping;
+    private bool movementBlocked;
+    private bool isTouchingWall;
+    private bool isWallJumping;
+    private bool isNearGround;
+    private bool isWalking;
+    private bool jumpAudioCheck;
+    private bool spinAudioCheck;
+    private bool Airlock;
+    
+    private bool spinningConditionMet;
+    private bool rollState;
+
+    private float verticalLookRotation;
+    private float speed;
+    public static float newRotationCheck = 0f;
+    private float stickDistanceInputs = 0f;
+    public static float rotationCheck = 0f;
+    public static float spinCooldownTimer = 0f;
+    public static float spinStateTimer = 4f;
+    private float clockoyote = 0f;
+    private float skidTimer;
+    private float movementBlockTimer;
+    private float midSpeed;
+    private float rollTimer = 0f;
+    public static float testTimer = 0f;
+    public static float holdtimer = 0f;
+
+    public static int spinDirection = 0;
+
+    private CharacterController controller;
+
+    private PlayerInput inputActions;
+
+    private Vector2 lookInput;
+    public static Vector3 velocity;
+    private Vector3 moveDirection;
+    private Vector3 lastMoveDirection;
+    private Vector3 launchDirection;
+    private Vector3 rollDirection;
+    #endregion
+
+
+    #region Execution Functions
+    /*
+    --------------------------------------- UNITY'S EXECUTION FUNCTIONS -----------------------------------------------------------------------
+    */
+
+    void Awake()
+    {
+        controller = GetComponent<CharacterController>(); //Start taking information from controller input
+        inputActions = new PlayerInput();
+
+        /*
+        //audio variables
+        FootstepsSound = FMODUnity.RuntimeManager.CreateInstance(FootstepEvent);
+        JumpSound = FMODUnity.RuntimeManager.CreateInstance(JumpEvent);
+        SpinSound = FMODUnity.RuntimeManager.CreateInstance(SpinEvent);
+        SkidSound = FMODUnity.RuntimeManager.CreateInstance(SkidEvent);
+        RollSound = FMODUnity.RuntimeManager.CreateInstance(RollEvent);
+        Debug.Log(spinTimeout);
+        */
+    }
+
+    void OnEnable()
+    {
+        inputActions.Enable();
+
+        //Connecting Left Joystick and WASD
+        inputActions.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
+        inputActions.Player.Move.canceled += ctx => moveInput = Vector2.zero;
+
+        //Connecting Right Joystick and Mouse
+        inputActions.Player.Look.performed += ctx => lookInput = ctx.ReadValue<Vector2>();
+        inputActions.Player.Look.canceled += ctx => lookInput = Vector2.zero;
+
+        //Connecting Sprint Alternative for Keyboard
+        inputActions.Player.Sprint.performed += ctx => walker = true;
+        inputActions.Player.Sprint.canceled += ctx => walker = false;
+
+        //Connecting Jump press
+        inputActions.Player.Jump.performed += ctx =>
+        {
+            jumpHold = true;
+            Jump();
+        };
+
+        inputActions.Player.Jump.canceled += ctx =>
+        {
+            jumpHold = false;
+        };
+
+        inputActions.Player.Roll.performed += ctx =>
+        {
+            RollDetect();
+        };
+
+    }
+
+    void OnDisable()
+    {
+        inputActions.Disable();
+    }
+
+    void Update()
+    {
+        RotateCamera();
+        RotateModel();
+        Roll();
+        //AudioChecks();
+
+        //Makes movement obey deadzones
+        if (moveInput.magnitude > deadZone)
+        {
+            moveDirection = MoveDirect();
+        }
+        else
+        {
+            moveDirection = Vector3.zero;
+        }
+
+        ApplyGravity();
+
+        if (movementBlocked) //if the boolean is not on, allow player to move by ignoring this function
+        {
+            MoveanBlock();
+        }
+        else // if there is no blockage move as usual
+        {
+            Move();
+        }
+
+        //defines coyote time to jump
+        if (controller.isGrounded || !jumped)
+        {
+            clockoyote = coyoteTimer;
+        }
+        else
+        {
+            clockoyote -= Time.deltaTime;
+        }
+
+        isNearGround = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance); //checks if the player is near ground
+
+        if (!controller.isGrounded) //checks for walls while jumping, no need to check them during ground state.
+        {
+            CheckWall();
+        }
+
+        DetectSpin();
+    }
+    #endregion
+
+
+    #region Main Functions
+    /*
+     --------------------------------------- MAIN FUNCTIONS ----------------------------------------------------------------------------------
+     */
+
+    Vector3 MoveDirect() //RESPONSIBLE OF HORIZONTAL MOVEMENT
+    {
+        if (isBackflipping || isWallJumping) //ignore user's joystick direction while backflipping
+        {
+            return launchDirection;
+        }
+
+        //Making movement based on camera perception
+        Vector3 forward = cameraTransform.forward;
+        Vector3 right = cameraTransform.right;
+        //set vertical values 0 and normalize them, this is more a preventive measurement
+        forward.y = 0f;
+        right.y = 0f;
+        forward.Normalize();
+        right.Normalize();
+        return (forward * moveInput.y + right * moveInput.x).normalized;
+    }
+
+
+    void Move() //HANDLES HORIZONTAL MOVEMENT SPEED
+    {
+        float inputMagnitude = Mathf.Clamp01(moveInput.magnitude);
+        //ifelse used to let keyboard users walk using shift.
+        if (!controller.isGrounded)
+        {
+            isSkidding = false;
+        }
+
+        if (walker || isSpinning)
+        {
+            midSpeed = slowSpeed;
+        }
+
+        else if (inputMagnitude > deadZone)
+        {
+            midSpeed = Mathf.Lerp(slowSpeed, fastSpeed, inputMagnitude); //Lerp handles the speed scaling from the joystick
+        }
+        else
+        {
+            midSpeed = 0f;
+        }
+
+        if (!isSkidding && speed > 2f && moveDirection.sqrMagnitude > 0.01f && lastMoveDirection.sqrMagnitude > 0.01f) //skidcheck
+        {
+            float dot = Vector3.Dot(lastMoveDirection, moveDirection);
+
+            if (dot < skidTolerance)
+            {
+                isSkidding = true;
+                skidTimer = skidDuration;
+            }
+        }
+
+        if (isSkidding) //when the skid state starts, run down the timer, perform the skid and leave the skid state once the timer has passed
+        {
+            skidTimer -= Time.deltaTime;
+
+            speed = Mathf.MoveTowards(speed, 0f, skidDeceleration * Time.deltaTime);
+
+            controller.Move(lastMoveDirection * speed * Time.deltaTime);
+
+            if (skidTimer <= 0f)
+                isSkidding = false;
+            return;
+        }
+
+        speed = Mathf.MoveTowards(speed, midSpeed, acceleration * Time.deltaTime);
+        controller.Move(moveDirection * speed * Time.deltaTime); //actual moving registered
+
+        if (speed > 0.1f && moveDirection.sqrMagnitude > 0.1f) //detection of the direction
+        {
+            isWalking = true;
+            lastMoveDirection = moveDirection;
+        }
+        else
+        {
+            isWalking = false;
+        }
+    }
+
+
+    void ApplyGravity() //HANDLES VERTICAL SPEED
+    {
+        
+        //this resets vertical speed when a player collides with a ceiling
+        CollisionFlags flags = controller.Move(velocity * Time.deltaTime * 2f);
+        
+        if ((flags & CollisionFlags.Above) != 0 && velocity.y > 0)
+        {
+            velocity.y = 0f;
+            movementBlockTimer = 0f; //interrupts special jumps if a wall is hit
+        }
+        
+
+        //this maintains the player grounded
+        if (controller.isGrounded)
+        {
+            velocity.y = 0f;
+            jumped = false;
+        }
+
+        //this implements the cut in jumping for variable jump
+        if (velocity.y > 0f && !jumpHold)
+        {
+            velocity.y += gravity * Time.deltaTime * jumpRelease;
+        }
+        else
+        {
+            velocity.y += gravity * Time.deltaTime;
+        }
+    }
+
+
+    void Jump() //HANDLES CHANGES IN VERTICAL SPEED CAUSED BY JUMPING
+    {
+        CheckWall(); //checks for walls during movement lock.
+
+        //WALL JUMP (only next to a wall and far from ground)
+        if (isTouchingWall && jumped && !isNearGround)
+        {
+            jumped = true;
+            jumpAudioCheck = true;
+            clockoyote = 0f;
+
+            movementBlocked = true;
+            isWallJumping = true;
+            movementBlockTimer = wallJumpLock;
+            velocity = launchDirection * wallJumpHorizontal;
+            velocity.y = wallJumpVertical;
+            return;
+        }
+
+        //OTHER JUMPS ALLOWED DURING COYOTE TIME
+        if (clockoyote > 0f) //preventing user from jumping more than once
+        {
+
+            //SPIN JUMP (only in ground and needs to be spinning)
+            if (isSpinning)
+            {
+                velocity.y = Mathf.Sqrt(jumpSpinHeight * -2f * gravity);
+                jumped = true;
+                jumpAudioCheck = true;
+            }
+
+            //BASE JUMP
+            else
+            {
+                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                clockoyote = 0f;
+                jumped = true;
+                jumpAudioCheck = true;
+            }
+
+            //BACKFLIP (needs to be in skid state)
+            if (isSkidding)
+            {
+                isSkidding = false;
+                speed = 0f;
+                Backflip();
+                jumpAudioCheck = true;
+
+            }
+
+            //variable reset after jumps
+            isSpinning = false;
+            rotationCheck = 0f;
+            spinDirection = 0;
+            previousStick = Vector2.zero;
+        }
+    }
+
+
+    void DetectSpin() //DETECTS IF THE PLAYER IS ATTEMPTING TO GET INTO THE SPINNING STATE
+    {
+        if (controller.isGrounded)
+        {
+            if (moveInput.sqrMagnitude >= 0.9f)
+            {
+                stickDistanceInputs = Vector2.Distance(moveInput, previousStick) / Time.deltaTime; //storing spin speed
+                angleDelta = Vector2.SignedAngle(previousStick, moveInput); //storing spin angle
+            }
+
+            if (Mathf.Abs(angleDelta) > 2f)
+            {
+                int currentDirection = angleDelta > 0 ? 1 : -1;
+
+                if (spinDirection == 0) //detects beginning of spin
+                {
+                    spinDirection = currentDirection;
+                }
+
+                if (currentDirection == spinDirection && !isSpinning) //checks if the joystick goes to the same direction, if it does, add to the spin charge
+                {
+                    rotationCheck += Mathf.Abs(angleDelta);
+                    stickSpeed = stickDistanceInputs;
+                    spinCooldownTimer += Time.deltaTime;
+                }
+                else //if not reset the charge
+                {
+                    rotationCheck = 0f;
+                    stickSpeed = 0f;
+                    spinDirection = currentDirection;
+                    spinCooldownTimer = 0f;
+                }
+            }
+
+            if (spinCooldownTimer >= 0.125f && !isSpinning)
+            {
+                spinDirection = 0;
+                rotationCheck = 0f;
+                stickSpeed = 0f;
+                spinCooldownTimer = 0f;
+            }
+
+            if (rotationCheck >= spinAngleTrigger/* && stickSpeed > 500f*/)
+            {
+                isSpinning = true;
+            }
+
+            if (isSpinning)
+            {
+                spinStateTimer -= Time.deltaTime;
+            }
+
+            //Everything below is what cancels the spin state and/or its check(s)
+
+            /*if (moveInput.sqrMagnitude < 0.9f) //if player isn't giving enough input reset entire state
+            {
+                previousStick = Vector2.zero;
+                isSpinning = false;
+                spinStateTimer = 4f;
+                rotationCheck = 0f;
+                stickSpeed = 0f;
+            }*/
+
+            if (spinStateTimer <= 0f) //reset spin state if timer = zero
+            {
+                isSpinning = false;
+                spinStateTimer = 4f;
+                rotationCheck = 0f;
+                stickSpeed = 0f;
+            }
+            
+            if (!isSpinning && wasSpinning) //prevents check from continuing after finishing spin, resets check as mentioned above
+            {
+                spinStateTimer = 4f;
+                rotationCheck = 0f;
+                stickSpeed = 0f;
+            }
+
+            previousStick = moveInput; //these are left at the very end of this function block to get previous state
+            wasSpinning = isSpinning;
+        }
+    }
+
+
+    void RotateCamera() //RESPONSIBLE OF THE CAMERA ROTATION AROUND THE MODEL.
+    {
+        float lookSensitivity = 120f;
+
+        float mouseX = lookInput.x * lookSensitivity * Time.deltaTime;
+        float mouseY = lookInput.y * lookSensitivity * Time.deltaTime;
+
+        cameraTransform.parent.Rotate(0f, mouseX, 0f);
+
+        verticalLookRotation -= mouseY;
+        verticalLookRotation = Mathf.Clamp(verticalLookRotation, -70f, 70f);
+
+        cameraTransform.localRotation = Quaternion.Euler(verticalLookRotation, 0f, 0f);
+    }
+
+
+    void RotateModel() //RESPONSIBLE OF ROTATING THE MODEL ACCORDING TO THE DIRECTION THE PLAYER IS MOVING
+    {
+
+        if (moveDirection.magnitude > 0.1f && !isBackflipping) //Moves only when joystick is tilted OR blocks when the player is doing a backflip
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+
+            modelTransform.rotation = Quaternion.Slerp(modelTransform.rotation, targetRotation, modelRotateSpeed * Time.deltaTime);
+        }
+        
+    }
+
+
+    void Backflip() //RESPONSIBLE OF THE BACKFLIP MECHANIC
+    {
+        //prevents extra movements and extra jumps during the backflip
+        jumped = true;
+        clockoyote = 0f;
+        launchDirection = MoveDirect();
+
+        //begins block movement and sets the timer
+        movementBlocked = true;
+        isBackflipping = true;
+        movementBlockTimer = blockedTimer;
+
+        //sets direction and height for the backflip.
+        velocity.x = launchDirection.x * backflipSpeed;
+        velocity.y = Mathf.Sqrt(backflipHeight * -2f * gravity);
+        velocity.z = launchDirection.z * backflipSpeed;
+    }
+
+    void MoveanBlock() //RESPONSIBLE OF BLOCKING USER MOVEMENT WHEN PERFORMING CERTAIN TYPES OF JUMPS
+    {
+
+        movementBlockTimer -= Time.deltaTime; //start the blocked movement period
+
+        //then reset everything once the time is up or if the player prematurely gets on a platform
+        if (movementBlockTimer <= 0f || controller.isGrounded)
+        {
+            movementBlocked = false;
+
+            if (isBackflipping) //reset values after Backflip
+            {
+                isBackflipping = false;
+                velocity.x = 0f;
+                velocity.z = 0f;
+                launchDirection = Vector3.zero;
+            }
+            if (isWallJumping) //reset values after Walljump
+            {
+                isWallJumping = false;
+
+                speed = new Vector2(velocity.x, velocity.z).magnitude;
+                moveDirection = new Vector3(velocity.x, 0f, velocity.z).normalized;
+                lastMoveDirection = moveDirection;
+
+                velocity.x = 0f;
+                velocity.z = 0f;
+                launchDirection = Vector3.zero;
+            }
+
+        }
+    }
+
+
+    void CheckWall() //RESPONSIBLE OF CHECKING IF THE PLAYER IS TOUCHING A WALL
+    {
+        isTouchingWall = false;
+
+        Vector3 origin = transform.position + Vector3.up;
+
+        if (Physics.Raycast(origin, modelTransform.forward, out RaycastHit hit, wallCheckDistance)) //the raycast checks if there is a wall
+        {
+            isTouchingWall = true;
+            launchDirection = hit.normal;
+        }
+    }
+
+    void RollDetect() //TRIGGERS BOOLEANS AND TIMES WHEN PLAYER PRESSES THE ROLL BUTTON
+    {
+        if (rollState) return; //prevent user input from spamming.
+
+        rollTimer = rollDuration; //starts the roll
+        rollState = true; //tells roll() in update to run properly.
+    }
+
+    void Roll() //PERFORMS THE ACTUAL ROLL
+    {
+        if (controller.isGrounded) // Airlock permits player to only roll once middair, preventing infinite spam.
+        {
+            Airlock = false;
+        }
+        if (!rollState) return;
+
+        launchDirection = MoveDirect();
+        rollTimer -= Time.deltaTime;
+
+        if (moveInput.magnitude > deadZone && !Airlock) //checks that the player is actually moving towards somewhere, preventing mistriggers with no input
+        {
+            velocity = launchDirection * rollDash;
+        }
+
+        if (rollTimer <= 0f) //once the roll is over, reset everything and activate Airlock if the player hasn't hit the ground,
+        {
+            rollState = false;
+            velocity.x = 0f;
+            velocity.z = 0f;
+            Airlock = true;
+        }
+    }
+    #endregion
+
+
+    #region Audio Functions
+    /*
+         --------------------------------------- AUDIO FUNCTIONS ----------------------------------------------------------------------------------
+         */
+
+    /*
+    void AudioChecks() //contains all the checks for movement sounds
+    {
+        StepTime += Time.deltaTime;
+        skidTime += Time.deltaTime;
+        RollTime += Time.deltaTime;
+
+        //footsteps sound
+
+        if (isWalking && isNearGround && !isSkidding && !isSpinning && !jumped && !isBackflipping && !rollState)
+        {
+            if (StepTime >= FootstepRate)
+            {
+                FootstepsSound.start();
+                StepTime = 0f;
+            }
+        }
+        else if (isSkidding || isSpinning || jumped || isBackflipping || rollState)
+        {
+            FootstepsSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        }
+
+        //jump sound
+
+        if (jumpAudioCheck && jumped)
+        {
+            JumpSound.start();
+            jumpAudioCheck = false;
+
+        }
+
+        //spinning sound
+
+        if (isSpinning && spinAudioCheck)
+        {
+            Debug.Log("i");
+            SpinSound.start();
+            spinAudioCheck = false;
+        }
+        
+        if(!isSpinning)
+        {
+            SpinSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        }
+
+        //skid sound
+
+        if (isSkidding && isNearGround)
+        {
+            if (skidTime >= skidDuration + .2f)
+            {
+                SkidSound.start();
+                skidTime = 0f;
+            }
+        }
+        else
+        {
+            SkidSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        }
+
+        if (rollState)
+        {
+            if (RollTime >= rollDuration + .2f)
+            {
+                RollSound.start();
+                RollTime = 0f;
+            }
+        }
+        else
+        {
+            RollSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        }
+    }
+    */
+    #endregion
+}

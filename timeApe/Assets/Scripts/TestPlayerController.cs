@@ -49,7 +49,7 @@ public class TestThirdPersonController : MonoBehaviour
 
     [Header("Spin")]
     public float jumpSpinHeight = 20f;
-    public static float spinAngleTrigger = 900f;
+    public static float spinAngleTrigger = 900;
     public static float stickSpeed = 0f;
     //public float spinTimeout = 0.20f;
     public static float angleDelta = 0f;
@@ -108,7 +108,7 @@ public class TestThirdPersonController : MonoBehaviour
     public static float newRotationCheck = 0f;
     private float stickDistanceInputs = 0f;
     public static float rotationCheck = 0f;
-    public static float spinCooldownTimer = 2f;
+    public static float spinCooldownTimer = 0f;
     public static float spinStateTimer = 4f;
     private float clockoyote = 0f;
     private float skidTimer;
@@ -428,8 +428,8 @@ public class TestThirdPersonController : MonoBehaviour
             if (moveInput.sqrMagnitude >= 0.9f)
             {
                 stickDistanceInputs = Vector2.Distance(moveInput, previousStick) / Time.deltaTime; //storing spin speed
+                angleDelta = Vector2.SignedAngle(previousStick, moveInput); //storing spin angle
             }
-            angleDelta = Vector2.SignedAngle(previousStick, moveInput); //storing spin angle
 
             if (Mathf.Abs(angleDelta) > 2f)
             {
@@ -440,20 +440,30 @@ public class TestThirdPersonController : MonoBehaviour
                     spinDirection = currentDirection;
                 }
 
-                if (currentDirection == spinDirection) //checks if the joystick goes to the same direction, if it does, add to the spin charge
+                if (currentDirection == spinDirection && !isSpinning) //checks if the joystick goes to the same direction, if it does, add to the spin charge
                 {
                     rotationCheck += Mathf.Abs(angleDelta);
                     stickSpeed = stickDistanceInputs;
+                    spinCooldownTimer += Time.deltaTime;
                 }
                 else //if not reset the charge
                 {
                     rotationCheck = 0f;
                     stickSpeed = 0f;
                     spinDirection = currentDirection;
+                    spinCooldownTimer = 0f;
                 }
             }
 
-            if (rotationCheck >= spinAngleTrigger && stickSpeed > 500f)
+            if (spinCooldownTimer >= 0.125f && !isSpinning)
+            {
+                spinDirection = 0;
+                rotationCheck = 0f;
+                stickSpeed = 0f;
+                spinCooldownTimer = 0f;
+            }
+
+            if (rotationCheck >= spinAngleTrigger/* && stickSpeed > 500f*/)
             {
                 isSpinning = true;
             }
@@ -465,29 +475,14 @@ public class TestThirdPersonController : MonoBehaviour
 
             //Everything below is what cancels the spin state and/or its check(s)
 
-            if (moveInput.sqrMagnitude < 0.9f) //if player isn't giving enough input reset entire state
+            /*if (moveInput.sqrMagnitude < 0.9f) //if player isn't giving enough input reset entire state
             {
                 previousStick = Vector2.zero;
                 isSpinning = false;
                 spinStateTimer = 4f;
                 rotationCheck = 0f;
                 stickSpeed = 0f;
-            }
-
-            else if (moveInput.sqrMagnitude > 0.9f && !isSpinning && rotationCheck > spinAngleTrigger) //check that runs every 1.25 seconds that resets the spin check
-            {
-                /*testTimer += Time.deltaTime;
-
-                if (testTimer > 0.2f)
-                {
-                    rotationCheck = 0f;
-                    stickSpeed = 0f;
-                    testTimer = 0f;
-                }*/
-                rotationCheck = 0f;
-                stickSpeed = 0f;
-                testTimer = 0f;
-            }
+            }*/
 
             if (spinStateTimer <= 0f) //reset spin state if timer = zero
             {
@@ -497,8 +492,9 @@ public class TestThirdPersonController : MonoBehaviour
                 stickSpeed = 0f;
             }
             
-            if (wasSpinning) //prevents check from continuing after finishing spin, resets check as mentioned above
+            if (!isSpinning && wasSpinning) //prevents check from continuing after finishing spin, resets check as mentioned above
             {
+                spinStateTimer = 4f;
                 rotationCheck = 0f;
                 stickSpeed = 0f;
             }

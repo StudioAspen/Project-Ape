@@ -8,11 +8,13 @@ public class DebugManager : MonoBehaviour
     private TextMeshProUGUI spinDebugText;
     private bool isMenuActive;
     private Gamepad controller;
+    private Keyboard keyboardInput;
 
     void Start()
     {
         spinDebugText = FindAnyObjectByType<TextMeshProUGUI>();
         controller = Gamepad.current;
+        keyboardInput = Keyboard.current;
         spinDebugText.enabled = false;
     }
 
@@ -37,18 +39,20 @@ public class DebugManager : MonoBehaviour
             
         }
             spinDebugText.text = $"|SPIN STATE DEBUG| \n" +
-                $"Jump velocity: {Mathf.Round(TestThirdPersonController.velocity.y),0} \n" +
+                $"Jump velocity: {TestThirdPersonController.velocity.y} \n" +
                 $"Angle between current input \n" +
-                $"and previous input: {Mathf.Round(Mathf.Abs(TestThirdPersonController.angleDelta)),0} \n" +
+                $"and previous input: {TestThirdPersonController.angleDelta} \n" +
                 $"Current input: {TestThirdPersonController.moveInput} \n" +
+                $"Current input magnitude/length: {TestThirdPersonController.moveInput.sqrMagnitude} \n" +
                 $"Previous input: {TestThirdPersonController.previousStick} \n" +
-                $"Rotation check: {Mathf.Round(TestThirdPersonController.rotationCheck),0} \n" +
+                $"Rotation check: {TestThirdPersonController.rotationCheck} \n" +
                 $"Stick speed: {Mathf.Round(TestThirdPersonController.stickSpeed),0} \n" +
                 $"Spin state trigger angle: {TestThirdPersonController.spinAngleTrigger} \n" +
                 $"Is player spinning: {TestThirdPersonController.isSpinning} \n" +
                 $"Was player spinning: {TestThirdPersonController.wasSpinning} \n" +
-                $"Reset spin timer: {Mathf.Round(TestThirdPersonController.testTimer),2} \n" +
-                $"Spin state length timer: {Mathf.Round(TestThirdPersonController.spinStateTimer),0} ";
+                $"Reset spin timer: {TestThirdPersonController.testTimer} \n" +
+                $"Spin cooldown timer: {TestThirdPersonController.spinCooldownTimer} \n" +
+                $"Spin state length timer: {TestThirdPersonController.spinStateTimer} ";
             
         return;
     }

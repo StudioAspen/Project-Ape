@@ -1469,6 +1469,10 @@ PrefabInstance:
       value: event:/Jump
       objectReference: {fileID: 0}
     - target: {fileID: 8431170679897149040, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
+      propertyPath: RollEvent.Path
+      value: event:/Roll
+      objectReference: {fileID: 0}
+    - target: {fileID: 8431170679897149040, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
       propertyPath: SkidEvent.Path
       value: event:/Skid
       objectReference: {fileID: 0}
@@ -1515,6 +1519,22 @@ PrefabInstance:
     - target: {fileID: 8431170679897149040, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
       propertyPath: JumpEvent.Guid.Data4
       value: -2041523303
+      objectReference: {fileID: 0}
+    - target: {fileID: 8431170679897149040, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
+      propertyPath: RollEvent.Guid.Data1
+      value: 70123582
+      objectReference: {fileID: 0}
+    - target: {fileID: 8431170679897149040, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
+      propertyPath: RollEvent.Guid.Data2
+      value: 1312011461
+      objectReference: {fileID: 0}
+    - target: {fileID: 8431170679897149040, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
+      propertyPath: RollEvent.Guid.Data3
+      value: -220687177
+      objectReference: {fileID: 0}
+    - target: {fileID: 8431170679897149040, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
+      propertyPath: RollEvent.Guid.Data4
+      value: 666510301
       objectReference: {fileID: 0}
     - target: {fileID: 8431170679897149040, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
       propertyPath: SkidEvent.Guid.Data1

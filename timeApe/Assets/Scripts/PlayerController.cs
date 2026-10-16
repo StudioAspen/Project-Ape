@@ -683,7 +683,6 @@ public class ThirdPersonController : MonoBehaviour
 
         if (isSpinning && spinAudioCheck)
         {
-            Debug.Log("i");
             SpinSound.start();
             spinAudioCheck = false;
         }

@@ -128,7 +128,7 @@ public class ThirdPersonController : MonoBehaviour
     private Vector3 launchDirection;
     private Vector3 rollDirection;
 
-    private Vector3 startPos; //added
+    private Vector3 checkpointPos; //added
     #endregion
 
 
@@ -152,7 +152,7 @@ public class ThirdPersonController : MonoBehaviour
         RollSound = FMODUnity.RuntimeManager.CreateInstance(RollEvent);
         Debug.Log(spinTimeout);
 
-        startPos = transform.position; //added
+        checkpointPos = transform.position; //added
     }
 
     void OnEnable()
@@ -249,11 +249,18 @@ public class ThirdPersonController : MonoBehaviour
 
         DetectSpin();
 
-        if(transform.position.y < -120f) //added for death and respawn
+        if(transform.position.y < checkpointPos.y - 120f) //added for death and respawn
         {
-            transform.position = startPos;
+            transform.position = checkpointPos;
             velocity = Vector3.zero;
         }
+
+        //for updating checkpoint position when player reaches a new one
+        // if (#touching checkpoint)
+        // {
+        //     Vector3 newCheckpointPosition = transform.position; //or the position of the checkpoint object
+        //     checkpointPos = newCheckpointPosition;
+        // }
     }
     #endregion
 

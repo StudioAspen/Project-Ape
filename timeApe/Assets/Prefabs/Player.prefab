@@ -854,6 +854,7 @@ Transform:
   - {fileID: 5574104402571130888}
   - {fileID: 2806052547411988368}
   - {fileID: 4528834045907037435}
+  - {fileID: 2551325464611289570}
   m_Father: {fileID: 5170748891066684639}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6338682433756710105
@@ -1036,6 +1037,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &6752731417948101254
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2551325464611289570}
+  m_Layer: 0
+  m_Name: attackPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2551325464611289570
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6752731417948101254}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9024033431116226236}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7475341436621468915
 GameObject:
   m_ObjectHideFlags: 0
@@ -1464,6 +1496,14 @@ PrefabInstance:
       propertyPath: Player
       value: 
       objectReference: {fileID: 2782907790892054914}
+    - target: {fileID: 8431170679897149040, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
+      propertyPath: TempSpear
+      value: 
+      objectReference: {fileID: 5411153516361462090, guid: 4c5bc698c003d1746bfe8fb00589228d, type: 3}
+    - target: {fileID: 8431170679897149040, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
+      propertyPath: attackPoint
+      value: 
+      objectReference: {fileID: 2551325464611289570}
     - target: {fileID: 8431170679897149040, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
       propertyPath: JumpEvent.Path
       value: event:/Jump

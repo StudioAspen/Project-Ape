@@ -38,8 +38,8 @@ public class TestThirdPersonController : MonoBehaviour
     public float slowSpeed = 1f;
     public float rotationSpeed = 10f;
     public float modelRotateSpeed = 10f;
-    public static Vector2 moveInput;
-    public static Vector2 previousStick = Vector2.zero;
+    public Vector2 moveInput;
+    public Vector2 previousStick = Vector2.zero;
 
 
     [Space(10)] //skid variables
@@ -49,10 +49,14 @@ public class TestThirdPersonController : MonoBehaviour
 
     [Header("Spin")]
     public float jumpSpinHeight = 20f;
-    public static float spinAngleTrigger = 900;
-    public static float stickSpeed = 0f;
-    //public float spinTimeout = 0.20f;
-    public static float angleDelta = 0f;
+    public float spinAngleTrigger = 720f;
+    public float spinCooldownTimer;
+    public float spinTimeout = 0.3f;
+    public float angleDelta = 0f;
+    public float rotationCheck = 0f;
+    public float spinStateTimer = 4f;
+    public bool isSpinning;
+    public bool wasSpinning;
 
     [Header("Roll")]
     public float rollDash = 25f;
@@ -88,8 +92,6 @@ public class TestThirdPersonController : MonoBehaviour
     private bool jumped;
     private bool jumpHold;
     private bool walker;
-    public static bool isSpinning;
-    public static bool wasSpinning;
     private bool isBackflipping;
     private bool movementBlocked;
     private bool isTouchingWall;
@@ -105,11 +107,8 @@ public class TestThirdPersonController : MonoBehaviour
 
     private float verticalLookRotation;
     private float speed;
-    public static float newRotationCheck = 0f;
     private float stickDistanceInputs = 0f;
-    public static float rotationCheck = 0f;
-    public static float spinCooldownTimer = 0f;
-    public static float spinStateTimer = 4f;
+    
     private float clockoyote = 0f;
     private float skidTimer;
     private float movementBlockTimer;
@@ -118,14 +117,14 @@ public class TestThirdPersonController : MonoBehaviour
     public static float testTimer = 0f;
     public static float holdtimer = 0f;
 
-    public static int spinDirection = 0;
+    private int spinDirection = 0;
 
-    private CharacterController controller;
+    public CharacterController controller;
 
     private PlayerInput inputActions;
 
     private Vector2 lookInput;
-    public static Vector3 velocity;
+    public Vector3 velocity;
     private Vector3 moveDirection;
     private Vector3 lastMoveDirection;
     private Vector3 launchDirection;
@@ -200,6 +199,8 @@ public class TestThirdPersonController : MonoBehaviour
         RotateModel();
         Roll();
         //AudioChecks();
+
+        Debug.Log(isSpinning);
 
         //Makes movement obey deadzones
         if (moveInput.magnitude > deadZone)
@@ -332,7 +333,7 @@ public class TestThirdPersonController : MonoBehaviour
 
     void ApplyGravity() //HANDLES VERTICAL SPEED
     {
-        
+
         //this resets vertical speed when a player collides with a ceiling
         CollisionFlags flags = controller.Move(velocity * Time.deltaTime * 2f);
         
@@ -344,9 +345,9 @@ public class TestThirdPersonController : MonoBehaviour
         
 
         //this maintains the player grounded
-        if (controller.isGrounded)
+        if (controller.isGrounded && velocity.y < 0)
         {
-            velocity.y = 0f;
+            velocity.y = -2f;
             jumped = false;
         }
 
@@ -417,6 +418,7 @@ public class TestThirdPersonController : MonoBehaviour
             rotationCheck = 0f;
             spinDirection = 0;
             previousStick = Vector2.zero;
+            spinStateTimer = 4f;
         }
     }
 
@@ -425,85 +427,81 @@ public class TestThirdPersonController : MonoBehaviour
     {
         if (controller.isGrounded)
         {
-            if (moveInput.sqrMagnitude >= 0.9f)
-            {
-                stickDistanceInputs = Vector2.Distance(moveInput, previousStick) / Time.deltaTime; //storing spin speed
-                angleDelta = Vector2.SignedAngle(previousStick, moveInput); //storing spin angle
-            }
+            angleDelta = Vector2.SignedAngle(previousStick, moveInput); //storing spin angle
 
-            if (Mathf.Abs(angleDelta) > 2f)
+            if (Mathf.Abs(angleDelta) > 1f)
             {
                 int currentDirection = angleDelta > 0 ? 1 : -1;
 
                 if (spinDirection == 0) //detects beginning of spin
                 {
                     spinDirection = currentDirection;
+                    spinCooldownTimer = spinTimeout;
                 }
 
                 if (currentDirection == spinDirection && !isSpinning) //checks if the joystick goes to the same direction, if it does, add to the spin charge
                 {
                     rotationCheck += Mathf.Abs(angleDelta);
-                    stickSpeed = stickDistanceInputs;
-                    spinCooldownTimer += Time.deltaTime;
+                    spinCooldownTimer -= Time.deltaTime;
+
+                    if (spinCooldownTimer < 0f && !isSpinning)
+                    {
+                        rotationCheck = 0f;
+                        spinCooldownTimer = spinTimeout;
+                        spinDirection = currentDirection;
+                    }
                 }
                 else //if not reset the charge
                 {
                     rotationCheck = 0f;
-                    stickSpeed = 0f;
                     spinDirection = currentDirection;
-                    spinCooldownTimer = 0f;
+                    spinCooldownTimer = spinTimeout;
                 }
             }
 
-            if (spinCooldownTimer >= 0.125f && !isSpinning)
-            {
-                spinDirection = 0;
-                rotationCheck = 0f;
-                stickSpeed = 0f;
-                spinCooldownTimer = 0f;
-            }
-
-            if (rotationCheck >= spinAngleTrigger/* && stickSpeed > 500f*/)
+            if (rotationCheck >= spinAngleTrigger)
             {
                 isSpinning = true;
             }
 
-            if (isSpinning)
-            {
-                spinStateTimer -= Time.deltaTime;
-            }
-
-            //Everything below is what cancels the spin state and/or its check(s)
-
-            /*if (moveInput.sqrMagnitude < 0.9f) //if player isn't giving enough input reset entire state
-            {
-                previousStick = Vector2.zero;
-                isSpinning = false;
-                spinStateTimer = 4f;
-                rotationCheck = 0f;
-                stickSpeed = 0f;
-            }*/
-
-            if (spinStateTimer <= 0f) //reset spin state if timer = zero
-            {
-                isSpinning = false;
-                spinStateTimer = 4f;
-                rotationCheck = 0f;
-                stickSpeed = 0f;
-            }
-            
             if (!isSpinning && wasSpinning) //prevents check from continuing after finishing spin, resets check as mentioned above
             {
                 spinStateTimer = 4f;
                 rotationCheck = 0f;
-                stickSpeed = 0f;
             }
-
             previousStick = moveInput; //these are left at the very end of this function block to get previous state
             wasSpinning = isSpinning;
+
+        }
+        if (isSpinning)
+        {
+            spinStateTimer -= Time.deltaTime;
+
+            if (spinStateTimer < 0f)
+            {
+                spinStateTimer = 4f;
+                rotationCheck = 0f;
+                isSpinning = false;
+            }
         }
     }
 
+    bool IsGrounded()
+    {
+        float rayDistace = 0.6f;
+        Vector3 rayOrigin = transform.position + (Vector3.up * 0.3f);
+        Vector3 debugRayEnd = rayOrigin + (Vector3.down * rayDistace);
+
+        Debug.DrawLine(rayOrigin, debugRayEnd, Color.blue);
+        if (Physics.Raycast(rayOrigin, Vector3.down, rayDistace))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     void RotateCamera() //RESPONSIBLE OF THE CAMERA ROTATION AROUND THE MODEL.
     {

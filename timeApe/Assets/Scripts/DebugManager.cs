@@ -7,15 +7,19 @@ public class DebugManager : MonoBehaviour
     [Header("Debug Text")]
     private TextMeshProUGUI spinDebugText;
     private bool isMenuActive;
+
+    [Header("Debug Input")]
     private Gamepad controller;
-    private Keyboard keyboardInput;
+
+    [Header("Debug References")]
+    private TestThirdPersonController player;
 
     void Start()
     {
         spinDebugText = FindAnyObjectByType<TextMeshProUGUI>();
         controller = Gamepad.current;
-        keyboardInput = Keyboard.current;
         spinDebugText.enabled = false;
+        player = FindAnyObjectByType<TestThirdPersonController>();
     }
 
     void Update()
@@ -39,20 +43,19 @@ public class DebugManager : MonoBehaviour
             
         }
             spinDebugText.text = $"|SPIN STATE DEBUG| \n" +
-                $"Jump velocity: {TestThirdPersonController.velocity.y} \n" +
+                $"Jump velocity: {player.velocity.y} \n" +
                 $"Angle between current input \n" +
-                $"and previous input: {TestThirdPersonController.angleDelta} \n" +
-                $"Current input: {TestThirdPersonController.moveInput} \n" +
-                $"Current input magnitude/length: {TestThirdPersonController.moveInput.sqrMagnitude} \n" +
-                $"Previous input: {TestThirdPersonController.previousStick} \n" +
-                $"Rotation check: {TestThirdPersonController.rotationCheck} \n" +
-                $"Stick speed: {Mathf.Round(TestThirdPersonController.stickSpeed),0} \n" +
-                $"Spin state trigger angle: {TestThirdPersonController.spinAngleTrigger} \n" +
-                $"Is player spinning: {TestThirdPersonController.isSpinning} \n" +
-                $"Was player spinning: {TestThirdPersonController.wasSpinning} \n" +
-                $"Reset spin timer: {TestThirdPersonController.testTimer} \n" +
-                $"Spin cooldown timer: {TestThirdPersonController.spinCooldownTimer} \n" +
-                $"Spin state length timer: {TestThirdPersonController.spinStateTimer} ";
+                $"and previous input: {player.angleDelta} \n" +
+                $"Current input: {player.moveInput} \n" +
+                $"Current input magnitude/length: {player.moveInput.sqrMagnitude} \n" +
+                $"Previous input: {player.previousStick} \n" +
+                $"Rotation check: {player.rotationCheck} \n" +
+                $"Spin state trigger angle: {player.spinAngleTrigger} \n" +
+                $"Is player spinning: {player.isSpinning} \n" +
+                $"Was player spinning: {player.wasSpinning} \n" +
+                $"Spin cooldown timer: {player.spinCooldownTimer} \n" +
+                $"Character controller grounded: {player.controller.isGrounded} \n" +
+                $"Spin state length timer: {player.spinStateTimer} ";
             
         return;
     }

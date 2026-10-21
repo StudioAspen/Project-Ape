@@ -795991,13 +795991,8 @@ MonoBehaviour:
   skidDeceleration: 100
   jumpSpinHeight: 6.5
   spinAngleTrigger: 720
-  spinCooldownTimer: 0
-  spinTimeout: 0.3
-  angleDelta: 0
-  rotationCheck: 0
-  spinStateTimer: 4
-  isSpinning: 0
-  wasSpinning: 0
+  spinTimeout: 0.6
+  spinStateLength: 4
   rollDash: 25
   rollDuration: 0.2
   controller: {fileID: 0}
@@ -1030727,7 +1030722,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6993998889978999343, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8317562083420877820, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       propertyPath: m_Height

@@ -45,17 +45,17 @@ public class DebugManager : MonoBehaviour
             spinDebugText.text = $"|SPIN STATE DEBUG| \n" +
                 $"Jump velocity: {player.velocity.y} \n" +
                 $"Angle between current input \n" +
-                $"and previous input: {player.angleDelta} \n" +
+                $"and previous input: {TestThirdPersonController.angleDelta} \n" +
                 $"Current input: {player.moveInput} \n" +
                 $"Current input magnitude/length: {player.moveInput.sqrMagnitude} \n" +
                 $"Previous input: {player.previousStick} \n" +
-                $"Rotation check: {player.rotationCheck} \n" +
+                $"Rotation check: {TestThirdPersonController.rotationCheck} \n" +
                 $"Spin state trigger angle: {player.spinAngleTrigger} \n" +
-                $"Is player spinning: {player.isSpinning} \n" +
-                $"Was player spinning: {player.wasSpinning} \n" +
-                $"Spin cooldown timer: {player.spinCooldownTimer} \n" +
+                $"Is player spinning: {TestThirdPersonController.isSpinning} \n" +
+                $"Was player spinning: {TestThirdPersonController.wasSpinning} \n" +
+                $"Spin cooldown timer: {TestThirdPersonController.spinCooldownTimer} \n" +
                 $"Character controller grounded: {player.controller.isGrounded} \n" +
-                $"Spin state length timer: {player.spinStateTimer} ";
+                $"Spin state length timer: {TestThirdPersonController.spinStateTimer} ";
             
         return;
     }

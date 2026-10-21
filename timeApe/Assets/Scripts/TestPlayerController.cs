@@ -2,6 +2,7 @@
 using System.Dynamic;
 using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.ProBuilder.Shapes;
@@ -50,13 +51,14 @@ public class TestThirdPersonController : MonoBehaviour
     [Header("Spin")]
     public float jumpSpinHeight = 20f;
     public float spinAngleTrigger = 720f;
-    public float spinCooldownTimer;
     public float spinTimeout = 0.3f;
-    public float angleDelta = 0f;
-    public float rotationCheck = 0f;
-    public float spinStateTimer = 4f;
-    public bool isSpinning;
-    public bool wasSpinning;
+    public float spinStateLength = 4f;
+    public static float rotationCheck = 0f;
+    public static float angleDelta = 0f;
+    public static float spinStateTimer;
+    public static float spinCooldownTimer;
+    public static bool isSpinning;
+    public static bool wasSpinning;
 
     [Header("Roll")]
     public float rollDash = 25f;
@@ -114,8 +116,6 @@ public class TestThirdPersonController : MonoBehaviour
     private float movementBlockTimer;
     private float midSpeed;
     private float rollTimer = 0f;
-    public static float testTimer = 0f;
-    public static float holdtimer = 0f;
 
     private int spinDirection = 0;
 
@@ -200,7 +200,9 @@ public class TestThirdPersonController : MonoBehaviour
         Roll();
         //AudioChecks();
 
-        Debug.Log(isSpinning);
+        //Debug.Log(IsGrounded());
+        Debug.Log(IsGroundedSphere());
+
 
         //Makes movement obey deadzones
         if (moveInput.magnitude > deadZone)
@@ -418,14 +420,14 @@ public class TestThirdPersonController : MonoBehaviour
             rotationCheck = 0f;
             spinDirection = 0;
             previousStick = Vector2.zero;
-            spinStateTimer = 4f;
+            spinStateTimer = spinStateLength;
         }
     }
 
 
     void DetectSpin() //DETECTS IF THE PLAYER IS ATTEMPTING TO GET INTO THE SPINNING STATE
     {
-        if (controller.isGrounded)
+        if (/*controller.isGrounded && IsGrounded()*/ IsGroundedSphere())
         {
             angleDelta = Vector2.SignedAngle(previousStick, moveInput); //storing spin angle
 
@@ -466,7 +468,7 @@ public class TestThirdPersonController : MonoBehaviour
 
             if (!isSpinning && wasSpinning) //prevents check from continuing after finishing spin, resets check as mentioned above
             {
-                spinStateTimer = 4f;
+                spinStateTimer = spinStateLength;
                 rotationCheck = 0f;
             }
             previousStick = moveInput; //these are left at the very end of this function block to get previous state
@@ -479,21 +481,36 @@ public class TestThirdPersonController : MonoBehaviour
 
             if (spinStateTimer < 0f)
             {
-                spinStateTimer = 4f;
+                spinStateTimer = spinStateLength;
                 rotationCheck = 0f;
                 isSpinning = false;
             }
         }
     }
 
-    bool IsGrounded()
-    {
-        float rayDistace = 0.6f;
-        Vector3 rayOrigin = transform.position + (Vector3.up * 0.3f);
-        Vector3 debugRayEnd = rayOrigin + (Vector3.down * rayDistace);
+    #region Ground Check Functions
 
-        Debug.DrawLine(rayOrigin, debugRayEnd, Color.blue);
-        if (Physics.Raycast(rayOrigin, Vector3.down, rayDistace))
+    Vector3 SphereCastOrigin()
+    {
+        Vector3 origin = transform.position + (Vector3.up * 0.5f);
+
+        return origin;
+    }
+
+    Vector3 RayCastOrigin()
+    {
+        Vector3 origin = transform.position + (Vector3.up * 0.3f);
+
+        return origin;
+    }
+
+    public bool IsGrounded() //old ground check
+    {
+        float rayDistance = 0.6f;
+        Vector3 debugRayEnd = RayCastOrigin() + (Vector3.down * rayDistance);
+
+        Debug.DrawLine(RayCastOrigin(), debugRayEnd, Color.blue);
+        if (Physics.Raycast(RayCastOrigin(), Vector3.down, rayDistance))
         {
             return true;
         }
@@ -502,6 +519,30 @@ public class TestThirdPersonController : MonoBehaviour
             return false;
         }
     }
+
+    public bool IsGroundedSphere()
+    {
+        float rayDistance = 0.8f;
+
+        if (Physics.SphereCast(SphereCastOrigin(), controller.radius - 0.4f, Vector3.down, out RaycastHit hitInfo, rayDistance))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    void OnDrawGizmos() //debugging purposes, only live in scene editor, still isn't fully fleshed out
+    {
+        if (IsGroundedSphere())
+        {
+            Gizmos.DrawSphere(SphereCastOrigin(), controller.radius - 0.4f);
+        }
+    }
+
+    #endregion
 
     void RotateCamera() //RESPONSIBLE OF THE CAMERA ROTATION AROUND THE MODEL.
     {

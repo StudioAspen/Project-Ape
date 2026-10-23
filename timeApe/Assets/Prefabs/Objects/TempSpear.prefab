@@ -136,10 +136,10 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 48
   m_CollisionDetection: 0
 --- !u!114 &-4380752124732667260
 MonoBehaviour:
@@ -153,3 +153,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a4c98bc5f0d88c47802c40e6dfb7aa5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpearScript
+  Player: {fileID: 0}

@@ -1,12 +1,12 @@
 using System.Collections;
-using Unity.VisualScripting;
-using UnityEditor.Callbacks;
 using UnityEngine;
 
 public class SpearScript : MonoBehaviour
 {
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
     private Rigidbody rb;
     private bool targetHit;
+    
     
 
 
@@ -22,7 +22,7 @@ public class SpearScript : MonoBehaviour
     }
 
     IEnumerator Waiter()
-    {
+    {   
         yield return new WaitForSeconds(3);
         Object.Destroy(this.gameObject);
     }
@@ -37,6 +37,8 @@ public class SpearScript : MonoBehaviour
         rb.isKinematic = true;
 
         transform.SetParent(collision.transform);
+      
 
-    } 
+    }
 }
+

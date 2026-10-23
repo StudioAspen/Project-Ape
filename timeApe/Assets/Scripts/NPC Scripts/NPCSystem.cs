@@ -5,12 +5,9 @@ using UnityEngine;
 public class NPCSystem : MonoBehaviour, IInteractable
 {
     [SerializeField] private SphereCollider interactCollider;
-    [Header("Dialogue UI References")]
     public TextMeshProUGUI dialogueText;
     public TextMeshProUGUI NPCNameText;
     public GameObject dialoguePanel;
-
-    [Space]
     public string dialogueLine;
     public string NPCName;
     public Transform playerTransform;
@@ -18,20 +15,18 @@ public class NPCSystem : MonoBehaviour, IInteractable
     private Coroutine lookAtCoroutine;
     private bool inRange;
     private bool isTalking;
-    private bool isFacingPlayer;
 
     void Start()
     {
         isTalking = false;
-        isFacingPlayer = false;
-        inRange = true;
+        inRange = false;
         dialoguePanel.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (inRange && Input.GetKeyDown(KeyCode.E))
+        if (inRange && Input.GetKeyDown(KeyCode.E)) //input will change when input action is created for interaction
         {
             Interact();
         }
@@ -39,9 +34,20 @@ public class NPCSystem : MonoBehaviour, IInteractable
 
     public void StartDialogue()
     {
-        if (isTalking && !isFacingPlayer)
+        dialoguePanel.SetActive(true);
+        dialogueText.text = dialogueLine;
+        NPCNameText.text = NPCName;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Player"))
         {
-            if (playerTransform == null)
+            inRange = true;
+            CanInteract();
+            
+            //when within trigger collider, turn and face player
+            if (playerTransform == null) 
             {
                 GameObject player = GameObject.FindGameObjectWithTag("Player");
                 if (player != null) playerTransform = player.transform;
@@ -52,9 +58,9 @@ public class NPCSystem : MonoBehaviour, IInteractable
 
                 lookAtCoroutine = StartCoroutine(LookAtPlayer());
             }
+
+            StartDialogue(); //delete when input system is set up for interaction
         }
-        dialoguePanel.SetActive(true);
-        dialogueText.text = dialogueLine;
     }
 
     private IEnumerator LookAtPlayer()
@@ -72,7 +78,6 @@ public class NPCSystem : MonoBehaviour, IInteractable
         }
 
         transform.rotation = targetRotation;
-        isFacingPlayer = true;
     }
 
     public bool CanInteract()
@@ -82,7 +87,6 @@ public class NPCSystem : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        Debug.Log("interacting");
         StartDialogue();
     }
 }

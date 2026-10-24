@@ -50,6 +50,17 @@ public class ThirdPersonController : MonoBehaviour
     public float rollDash = 25f;
     public float rollDuration = 0.2f;
 
+    [Header("Combat")]
+    public GameObject TempSpear;
+    public Transform attackPoint;
+    private InputAction m_throw;
+    public float throwCooldown;
+    public float throwForce;
+    public float throwUpwardForce;
+
+    bool readyToThrow;
+   
+
 
     [Header("Audio Stuff")]
     public GameObject Player;
@@ -116,6 +127,9 @@ public class ThirdPersonController : MonoBehaviour
     private Vector3 lastMoveDirection;
     private Vector3 launchDirection;
     private Vector3 rollDirection;
+
+    private Vector3 checkpointPos; //added
+    private float maxFallDistance = -120f; //added, the distance below which the player will respawn
     #endregion
 
 
@@ -126,8 +140,10 @@ public class ThirdPersonController : MonoBehaviour
 
     void Awake()
     {
+        readyToThrow = true; //throw is ready at the start
         controller = GetComponent<CharacterController>(); //Start taking information from controller input
         inputActions = new PlayerInput();
+        m_throw = InputSystem.actions.FindAction("Throw");
 
         //audio variables
         FootstepsSound = FMODUnity.RuntimeManager.CreateInstance(FootstepEvent);
@@ -136,6 +152,8 @@ public class ThirdPersonController : MonoBehaviour
         SkidSound = FMODUnity.RuntimeManager.CreateInstance(SkidEvent);
         RollSound = FMODUnity.RuntimeManager.CreateInstance(RollEvent);
         Debug.Log(spinTimeout);
+
+        checkpointPos = transform.position; //added
     }
 
     void OnEnable()
@@ -170,6 +188,8 @@ public class ThirdPersonController : MonoBehaviour
         {
             RollDetect();
         };
+        
+        
 
     }
 
@@ -223,10 +243,50 @@ public class ThirdPersonController : MonoBehaviour
             CheckWall();
         }
 
+        if(m_throw.WasPressedThisFrame() && readyToThrow) // throws spear
+        {
+            Attack();
+        }
+
         DetectSpin();
+
+        if(transform.position.y < maxFallDistance) //added for death and respawn, currently -120f is the death threshold, can be changed to any value
+        {
+            Respawn();
+        }
+
+        //for updating checkpoint position when player reaches a new one
+        // if (#touching checkpoint)
+        // {
+        //     Vector3 newCheckpointPosition = transform.position; //or the position of the checkpoint object
+        //     checkpointPos = newCheckpointPosition;
+        // }
     }
     #endregion
 
+    //added for checkpoint collision detection
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.gameObject.CompareTag("Checkpoint"))
+        {
+            Vector3 newCheckpointPosition = transform.position; //or the position of the checkpoint object
+            checkpointPos = newCheckpointPosition;
+            Debug.Log("Checkpoint reached!");
+        }
+
+        if (hit.gameObject.CompareTag("water")) //added for dying when touching water
+        {
+            Respawn();
+        }
+    }
+
+
+    //added, respawn method
+    public void Respawn()
+    {
+        transform.position = checkpointPos;
+        velocity = Vector3.zero;
+    }
 
     #region Main Functions
     /*
@@ -591,6 +651,27 @@ public class ThirdPersonController : MonoBehaviour
             Airlock = true;
         }
     }
+
+    private void Attack() // SHOOTS SPEAR
+    {
+
+        readyToThrow = false; //so it cannot be spammed
+
+        GameObject spear = Instantiate(TempSpear, attackPoint.position, cameraTransform.rotation); //this is what creates the spear at the attackpoint
+
+        Rigidbody spearRb = spear.GetComponent<Rigidbody>(); //this grabs the rigidbody component of the spear
+
+        Vector3 forceToAdd = cameraTransform.transform.forward * throwForce + transform.up * throwUpwardForce; //force for the spear's rigidbody
+
+        spearRb.AddForce(forceToAdd, ForceMode.Impulse); //applies spear force
+
+        Invoke(nameof(ResetThrow), throwCooldown); // starts resetthrow function in whatever time is set for throwcooldown
+    }
+
+    private void ResetThrow() //resets the throw
+    {
+        readyToThrow = true;
+    }
     #endregion
 
 
@@ -632,7 +713,6 @@ public class ThirdPersonController : MonoBehaviour
 
         if (isSpinning && spinAudioCheck)
         {
-            Debug.Log("i");
             SpinSound.start();
             spinAudioCheck = false;
         }

@@ -26,7 +26,7 @@ public class NPCSystem : MonoBehaviour, IInteractable
     // Update is called once per frame
     void Update()
     {
-        if (inRange && Input.GetKeyDown(KeyCode.E)) //input will change when input action is created for interaction
+        if (inRange) //add input condition when input action is created for interaction
         {
             Interact();
         }
@@ -37,6 +37,14 @@ public class NPCSystem : MonoBehaviour, IInteractable
         dialoguePanel.SetActive(true);
         dialogueText.text = dialogueLine;
         NPCNameText.text = NPCName;
+    }
+
+    public void EndDialogue()
+    {
+        StopAllCoroutines();
+        dialoguePanel.SetActive(false);
+        dialogueText.text = "";
+        NPCNameText.text = "";
     }
 
     void OnTriggerEnter(Collider other)
@@ -58,8 +66,15 @@ public class NPCSystem : MonoBehaviour, IInteractable
 
                 lookAtCoroutine = StartCoroutine(LookAtPlayer());
             }
+        }
+    }
 
-            StartDialogue(); //delete when input system is set up for interaction
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            inRange = false;
+            EndDialogue();
         }
     }
 

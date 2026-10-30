@@ -796113,6 +796113,7 @@ MonoBehaviour:
   wallJumpLock: 0.2
   wallJumpHorizontal: 11
   wallJumpVertical: 15
+  wallFriction: -0.95
   modelTransform: {fileID: 214252505}
   acceleration: 100
   blockedTimer: 1
@@ -796123,6 +796124,8 @@ MonoBehaviour:
   modelRotateSpeed: 10
   moveInput: {x: 0, y: 0}
   previousStick: {x: 0, y: 0}
+  velocity: {x: 0, y: 0, z: 0}
+  controller: {fileID: 0}
   skidTolerance: -0.7
   skidDuration: 0.1
   skidDeceleration: 100
@@ -796132,8 +796135,6 @@ MonoBehaviour:
   spinStateLength: 4
   rollDash: 25
   rollDuration: 0.2
-  controller: {fileID: 0}
-  velocity: {x: 0, y: 0, z: 0}
 --- !u!1 &712060489
 GameObject:
   m_ObjectHideFlags: 0
@@ -1030819,15 +1030820,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5170748891066684639, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 33.3
+      value: 38.89
       objectReference: {fileID: 0}
     - target: {fileID: 5170748891066684639, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 118.58
+      value: 113.8
       objectReference: {fileID: 0}
     - target: {fileID: 5170748891066684639, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 121.68
+      value: 114.7
       objectReference: {fileID: 0}
     - target: {fileID: 5170748891066684639, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1030855,6 +1030856,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5170748891066684639, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5605487172631938456, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6993998889978999343, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}

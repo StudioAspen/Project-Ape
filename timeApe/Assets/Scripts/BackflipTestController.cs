@@ -225,6 +225,8 @@ public class BackflipTestController : MonoBehaviour
         //AudioChecks();
         DetectSpin();
 
+        Debug.Log(jumpBufferCounter);
+
         if (inputActions.Player.Jump.WasPressedThisFrame())
             jumpBufferCounter = jumpBufferTime;
         else
@@ -233,7 +235,6 @@ public class BackflipTestController : MonoBehaviour
         if(isSkidding)
         {
             skidTimer -= Time.deltaTime;
-            backflipGraceCounter = backflipGraceTime;
 
             if(jumpBufferCounter > 0f)
             {

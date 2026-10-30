@@ -129,6 +129,7 @@ public class ThirdPersonController : MonoBehaviour
     private Vector3 rollDirection;
 
     private Vector3 checkpointPos; //added
+    private float maxFallDistance = -120f; //added, the distance below which the player will respawn
     #endregion
 
 
@@ -249,10 +250,9 @@ public class ThirdPersonController : MonoBehaviour
 
         DetectSpin();
 
-        if(transform.position.y < checkpointPos.y - 120f) //added for death and respawn
+        if(transform.position.y < maxFallDistance) //added for death and respawn, currently -120f is the death threshold, can be changed to any value
         {
-            transform.position = checkpointPos;
-            velocity = Vector3.zero;
+            Respawn();
         }
 
         //for updating checkpoint position when player reaches a new one
@@ -264,6 +264,29 @@ public class ThirdPersonController : MonoBehaviour
     }
     #endregion
 
+    //added for checkpoint collision detection
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.gameObject.CompareTag("Checkpoint"))
+        {
+            Vector3 newCheckpointPosition = transform.position; //or the position of the checkpoint object
+            checkpointPos = newCheckpointPosition;
+            Debug.Log("Checkpoint reached!");
+        }
+
+        if (hit.gameObject.CompareTag("water")) //added for dying when touching water
+        {
+            Respawn();
+        }
+    }
+
+
+    //added, respawn method
+    public void Respawn()
+    {
+        transform.position = checkpointPos;
+        velocity = Vector3.zero;
+    }
 
     #region Main Functions
     /*

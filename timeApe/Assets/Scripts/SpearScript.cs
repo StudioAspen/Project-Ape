@@ -42,7 +42,7 @@ public class SpearScript : MonoBehaviour
         Rigidbody spearRb = GetComponent<Rigidbody>();
         spearRb.isKinematic = true; 
 
-        Enemy enemyComponent = collision.gameObject.GetComponent<Enemy>(); // gets information of any enemy with the enemy script
+        EnemyBehavior enemyComponent = collision.gameObject.GetComponent<EnemyBehavior>(); // gets information of any enemy with the enemy script
         StartCoroutine(Waiter());
 
         if (enemyComponent != null && !isPulling)

@@ -31,6 +31,7 @@ public class TestThirdPersonController : MonoBehaviour
     public float wallJumpLock = 0.2f;
     public float wallJumpHorizontal = 10f;
     public float wallJumpVertical = 10f;
+    public float wallFriction = -0.9f;
 
     [Header("Movement")]
     public Transform modelTransform; //The Character Model Goes here in the editor
@@ -130,6 +131,7 @@ public class TestThirdPersonController : MonoBehaviour
     private Vector3 lastMoveDirection;
     private Vector3 launchDirection;
     private Vector3 rollDirection;
+    private MeshRenderer mesh;
     #endregion
 
     #region Execution Functions
@@ -223,7 +225,8 @@ public class TestThirdPersonController : MonoBehaviour
 
     void WallJumpCheck()
     {
-        isNearGround = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance); //checks if the player is near ground
+        isNearGround = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance); //checks if the player is near ground;
+        Debug.DrawLine(transform.position, transform.transform.position + Vector3.down, Color.blue);
 
         if (!controller.isGrounded) //checks for walls while jumping, no need to check them during ground state.
         {
@@ -340,7 +343,7 @@ public class TestThirdPersonController : MonoBehaviour
 
     void ApplyGravity() //HANDLES VERTICAL SPEED
     {
-
+        Debug.Log(isNearGround);
         //this resets vertical speed when a player collides with a ceiling
         CollisionFlags flags = controller.Move(velocity * Time.deltaTime * 2f);
         
@@ -367,6 +370,11 @@ public class TestThirdPersonController : MonoBehaviour
         {
             velocity.y += gravity * Time.deltaTime;
         }
+
+        if (isTouchingWall && velocity.y < -3f)
+        {
+            velocity.y += gravity * wallFriction * Time.deltaTime;
+        }
     }
 
     void Jump() //HANDLES CHANGES IN VERTICAL SPEED CAUSED BY JUMPING
@@ -374,17 +382,21 @@ public class TestThirdPersonController : MonoBehaviour
         StartCheckWall(); //checks for walls during movement lock.
 
         //WALL JUMP (only next to a wall and far from ground)
-        if (isTouchingWall && jumped && !isNearGround)
+        if (isTouchingWall && !isNearGround)
         {
-            jumped = true;
-            jumpAudioCheck = true;
-            clockoyote = 0f;
+            if (jumped)
+            {
+                jumped = true;
+                jumpAudioCheck = true;
+                isWallJumping = true;
+                velocity = launchDirection * wallJumpHorizontal;
+                velocity.y = wallJumpVertical;
+            }
 
+            clockoyote = 0f;
             movementBlocked = true;
-            isWallJumping = true;
             movementBlockTimer = wallJumpLock;
-            velocity = launchDirection * wallJumpHorizontal;
-            velocity.y = wallJumpVertical;
+            
             return;
         }
 
@@ -577,10 +589,12 @@ public class TestThirdPersonController : MonoBehaviour
 
         Vector3 origin = transform.position + Vector3.up;
 
+        Debug.DrawLine(origin, origin + modelTransform.forward, Color.red);
         if (Physics.Raycast(origin, modelTransform.forward, out RaycastHit hit, wallCheckDistance)) //the raycast checks if there is a wall
         {
             isTouchingWall = true;
             launchDirection = hit.normal;
+
         }
     }
 

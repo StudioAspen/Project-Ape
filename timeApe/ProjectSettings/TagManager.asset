@@ -7,6 +7,7 @@ TagManager:
   - water
   - Checkpoint
   - Enemy
+  - NPC
   layers:
   - Default
   - TransparentFX

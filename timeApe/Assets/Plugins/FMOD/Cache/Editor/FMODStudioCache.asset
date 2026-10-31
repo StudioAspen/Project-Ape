@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-9218521528245039978
+--- !u!114 &-6592053924872898954
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -19,7 +19,7 @@ MonoBehaviour:
     Data3: -1348499071
     Data4: -540598375
   Banks:
-  - {fileID: -4383538444673263487}
+  - {fileID: 5200510135983370440}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -27,63 +27,7 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 676
---- !u!114 &-8537417664364849098
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/Master.bank
-  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorBankRef
-  Path: ../../../Documents/GitHub/Project-Ape/timeApe/FMOD/Desktop/Master.bank
-  Name: Master
-  StudioPath: bank:/Master
-  lastModified: 639238929725240349
-  FileSizes: []
-  Exists: 1
---- !u!114 &-4383538444673263487
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/Master.bank
-  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorBankRef
-  Path: FMOD/Desktop/Master.bank
-  Name: Master
-  StudioPath: bank:/Master
-  lastModified: 639266359194065920
-  FileSizes: []
-  Exists: 1
---- !u!114 &-3514624063930182634
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/Master.strings.bank
-  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorBankRef
-  Path: FMOD/Desktop/Master.strings.bank
-  Name: Master.strings
-  StudioPath: bank:/Master.strings
-  lastModified: 639266359194065920
-  FileSizes:
-  - Name: 
-    Value: 934
-  Exists: 1
---- !u!114 &-2775251435581994319
+--- !u!114 &-5415547627577005010
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -93,24 +37,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
-  m_Name: event:/Roll
+  m_Name: event:/Spin
   m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
-  Path: event:/Roll
+  Path: event:/Spin
   Guid:
-    Data1: 70123582
-    Data2: 1312011461
-    Data3: -220687177
-    Data4: 666510301
+    Data1: -2037438526
+    Data2: 1137907855
+    Data3: 2105490869
+    Data4: -1321954566
   Banks:
-  - {fileID: -4383538444673263487}
-  IsStream: 0
+  - {fileID: 5200510135983370440}
+  IsStream: 1
   Is3D: 0
-  IsOneShot: 1
+  IsOneShot: 0
   Parameters: []
   MinDistance: 1
   MaxDistance: 20
-  Length: 1312
---- !u!114 &-2229986527137261142
+  Length: 600
+--- !u!114 &-1867954770767308599
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -129,7 +73,7 @@ MonoBehaviour:
     Data3: 541689473
     Data4: 732998442
   Banks:
-  - {fileID: -4383538444673263487}
+  - {fileID: 5200510135983370440}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -150,33 +94,33 @@ MonoBehaviour:
   m_Name: FMODStudioCache
   m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EventCache
   EditorBanks:
-  - {fileID: -3514624063930182634}
-  - {fileID: -4383538444673263487}
+  - {fileID: 4021354383950304494}
+  - {fileID: 5200510135983370440}
   EditorEvents:
-  - {fileID: -9218521528245039978}
-  - {fileID: 9076034212685872381}
-  - {fileID: 8733534355092726361}
-  - {fileID: -2229986527137261142}
-  - {fileID: -2775251435581994319}
+  - {fileID: -1867954770767308599}
+  - {fileID: 8481969361936703622}
+  - {fileID: 7652282409500813658}
+  - {fileID: -6592053924872898954}
+  - {fileID: -5415547627577005010}
   EditorParameters: []
   MasterBanks:
-  - {fileID: -4383538444673263487}
+  - {fileID: 5200510135983370440}
   StringsBanks:
-  - {fileID: -3514624063930182634}
+  - {fileID: 4021354383950304494}
   cacheVersion: 131860
   cacheTime: 639266359194065920
   SerializableEventsDict:
-  - key: event:/Footsteps
-    index: 0
-  - key: event:/Jump
-    index: 1
-  - key: event:/Spin
-    index: 2
   - key: event:/Skid
-    index: 3
+    index: 0
   - key: event:/Roll
+    index: 1
+  - key: event:/Jump
+    index: 2
+  - key: event:/Footsteps
+    index: 3
+  - key: event:/Spin
     index: 4
---- !u!114 &3300903613083432952
+--- !u!114 &4021354383950304494
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -188,15 +132,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
   m_Name: bank:/Master.strings.bank
   m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorBankRef
-  Path: ../../../Documents/GitHub/Project-Ape/timeApe/FMOD/Desktop/Master.strings.bank
+  Path: FMOD/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 639238929725260445
+  lastModified: 639266359194065920
   FileSizes:
   - Name: 
-    Value: 770
+    Value: 934
   Exists: 1
---- !u!114 &7194395661187237299
+--- !u!114 &5200510135983370440
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -205,52 +149,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
-  m_Name: event:/Footsteps
-  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
-  Path: event:/Footsteps
-  Guid:
-    Data1: -1210842539
-    Data2: 1256570919
-    Data3: -1348499071
-    Data4: -540598375
-  Banks:
-  - {fileID: -8537417664364849098}
-  IsStream: 0
-  Is3D: 0
-  IsOneShot: 1
-  Parameters: []
-  MinDistance: 1
-  MaxDistance: 20
-  Length: 676
---- !u!114 &8733534355092726361
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
-  m_Name: event:/Spin
-  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
-  Path: event:/Spin
-  Guid:
-    Data1: -2037438526
-    Data2: 1137907855
-    Data3: 2105490869
-    Data4: -1321954566
-  Banks:
-  - {fileID: -4383538444673263487}
-  IsStream: 1
-  Is3D: 0
-  IsOneShot: 0
-  Parameters: []
-  MinDistance: 1
-  MaxDistance: 20
-  Length: 600
---- !u!114 &9076034212685872381
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.bank
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorBankRef
+  Path: FMOD/Desktop/Master.bank
+  Name: Master
+  StudioPath: bank:/Master
+  lastModified: 639266359194065920
+  FileSizes: []
+  Exists: 1
+--- !u!114 &7652282409500813658
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -269,7 +177,7 @@ MonoBehaviour:
     Data3: 1318516132
     Data4: -2041523303
   Banks:
-  - {fileID: -4383538444673263487}
+  - {fileID: 5200510135983370440}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -277,3 +185,30 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 1500
+--- !u!114 &8481969361936703622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Roll
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Roll
+  Guid:
+    Data1: 70123582
+    Data2: 1312011461
+    Data3: -220687177
+    Data4: 666510301
+  Banks:
+  - {fileID: 5200510135983370440}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 1312

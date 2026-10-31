@@ -129,6 +129,7 @@ public class ThirdPersonController : MonoBehaviour
     private Vector3 rollDirection;
 
     private Vector3 checkpointPos; //added
+    private float maxFallDistance = -120f; //added, the distance below which the player will respawn
     #endregion
 
 
@@ -251,7 +252,7 @@ public class ThirdPersonController : MonoBehaviour
 
         DetectSpin();
 
-        if(transform.position.y < -120f) //added for death and respawn, currently -120f is the death threshold, can be changed to any value
+        if(transform.position.y < maxFallDistance) //added for death and respawn, currently -120f is the death threshold, can be changed to any value
         {
             Respawn();
         }

@@ -192244,6 +192244,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: FMODUnity::FMODUnity.StudioListener
   nonRigidbodyVelocity: 0
   attenuationObject: {fileID: 0}
+--- !u!4 &95831527 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 259591734524277414, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+  m_PrefabInstance: {fileID: 883636331}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &95998573
 GameObject:
   m_ObjectHideFlags: 0
@@ -232766,11 +232771,6 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
---- !u!4 &214252505 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 9024033431116226236, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
-  m_PrefabInstance: {fileID: 883636331}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &215784415
 GameObject:
   m_ObjectHideFlags: 0
@@ -796084,56 +796084,6 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
---- !u!1 &712018690 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2782907790892054914, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
-  m_PrefabInstance: {fileID: 883636331}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &712018694
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 712018690}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3d453a426e246f4a8635b24d62ec900, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TestThirdPersonController
-  cameraTransform: {fileID: 1879827483}
-  coyoteTimer: 0.2
-  gravity: -50
-  jumpHeight: 2.5
-  jumpRelease: 2.5
-  backflipSpeed: 8
-  backflipHeight: 5
-  groundCheckDistance: 2
-  wallCheckDistance: 1.2
-  wallJumpLock: 0.2
-  wallJumpHorizontal: 11
-  wallJumpVertical: 15
-  modelTransform: {fileID: 214252505}
-  acceleration: 100
-  blockedTimer: 1
-  deadZone: 0.3
-  fastSpeed: 15
-  slowSpeed: 1
-  rotationSpeed: 15
-  modelRotateSpeed: 10
-  moveInput: {x: 0, y: 0}
-  previousStick: {x: 0, y: 0}
-  skidTolerance: -0.7
-  skidDuration: 0.1
-  skidDeceleration: 100
-  jumpSpinHeight: 6.5
-  spinAngleTrigger: 720
-  spinTimeout: 0.6
-  spinStateLength: 4
-  rollDash: 25
-  rollDuration: 0.2
-  controller: {fileID: 0}
-  velocity: {x: 0, y: 0, z: 0}
 --- !u!1 &712060489
 GameObject:
   m_ObjectHideFlags: 0
@@ -1030790,6 +1030740,10 @@ PrefabInstance:
       value: 0.65
       objectReference: {fileID: 0}
     - target: {fileID: 902052519996820736, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 902052519996820736, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       propertyPath: RollEvent.Path
       value: event:/Roll
       objectReference: {fileID: 0}
@@ -1030823,7 +1030777,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5170748891066684639, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 118.58
+      value: 106.09
       objectReference: {fileID: 0}
     - target: {fileID: 5170748891066684639, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1030871,13 +1030825,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 0}
-    - {fileID: 902052519996820736, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 2782907790892054914, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 712018694}
+      addedObject: {fileID: 1492485161}
+    - targetCorrespondingSourceObject: {fileID: 1319545288104278634, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1443140967}
+    - targetCorrespondingSourceObject: {fileID: 1319545288104278634, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1443140966}
     - targetCorrespondingSourceObject: {fileID: 1351762856464510269, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1879827484}
@@ -1031265,6 +1031224,11 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
+--- !u!4 &884620190 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9024033431116226236, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+  m_PrefabInstance: {fileID: 883636331}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &885398723
 GameObject:
   m_ObjectHideFlags: 0
@@ -1629479,6 +1629443,83 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!1 &1443140964 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1319545288104278634, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+  m_PrefabInstance: {fileID: 883636331}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1443140966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1443140964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 020b750c75008ff44bcabb84dd6c62a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BackflipTestController
+  cameraTransform: {fileID: 0}
+  coyoteTimer: 0.2
+  gravity: -90
+  jumpHeight: 10
+  jumpRelease: 2.5
+  backflipSpeed: 10
+  backflipHeight: 10
+  jumpBufferTime: 0.15
+  backflipGraceTime: 0.15
+  groundCheckDistance: 2
+  wallCheckDistance: 0.7
+  wallJumpLock: 0.2
+  wallJumpHorizontal: 10
+  wallJumpVertical: 10
+  modelTransform: {fileID: 0}
+  acceleration: 40
+  blockedTimer: 1
+  deadZone: 0.4
+  fastSpeed: 20
+  slowSpeed: 1
+  rotationSpeed: 10
+  modelRotateSpeed: 10
+  moveInput: {x: 0, y: 0}
+  previousStick: {x: 0, y: 0}
+  velocity: {x: 0, y: 0, z: 0}
+  controller: {fileID: 0}
+  skidTolerance: -0.7
+  skidDuration: 0.2
+  skidDeceleration: 30
+  jumpSpinHeight: 20
+  spinAngleTrigger: 720
+  spinTimeout: 0.3
+  spinStateLength: 4
+  rollDash: 25
+  rollDuration: 0.2
+--- !u!143 &1443140967
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1443140964}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 0.99999964
+  m_Radius: 0.5000001
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!43 &1445678554
 Mesh:
   m_ObjectHideFlags: 0
@@ -1648843,6 +1648884,58 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!1 &1492485158 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2782907790892054914, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+  m_PrefabInstance: {fileID: 883636331}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1492485161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1492485158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 020b750c75008ff44bcabb84dd6c62a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BackflipTestController
+  cameraTransform: {fileID: 95831527}
+  coyoteTimer: 0.2
+  gravity: -90
+  jumpHeight: 10
+  jumpRelease: 2.5
+  backflipSpeed: 10
+  backflipHeight: 10
+  jumpBufferTime: 0.15
+  backflipGraceTime: 0.15
+  groundCheckDistance: 2
+  wallCheckDistance: 0.7
+  wallJumpLock: 0.2
+  wallJumpHorizontal: 10
+  wallJumpVertical: 10
+  modelTransform: {fileID: 884620190}
+  acceleration: 40
+  blockedTimer: 1
+  deadZone: 0.4
+  fastSpeed: 20
+  slowSpeed: 1
+  rotationSpeed: 10
+  modelRotateSpeed: 10
+  moveInput: {x: 0, y: 0}
+  previousStick: {x: 0, y: 0}
+  velocity: {x: 0, y: 0, z: 0}
+  controller: {fileID: 0}
+  skidTolerance: -0.7
+  skidDuration: 0.2
+  skidDeceleration: 30
+  jumpSpinHeight: 20
+  spinAngleTrigger: 720
+  spinTimeout: 0.3
+  spinStateLength: 4
+  rollDash: 25
+  rollDuration: 0.2
 --- !u!43 &1493670856
 Mesh:
   m_ObjectHideFlags: 0
@@ -2083368,11 +2083461,6 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
---- !u!4 &1879827483 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2360449263192638994, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
-  m_PrefabInstance: {fileID: 883636331}
-  m_PrefabAsset: {fileID: 0}
 --- !u!65 &1879827484
 BoxCollider:
   m_ObjectHideFlags: 0

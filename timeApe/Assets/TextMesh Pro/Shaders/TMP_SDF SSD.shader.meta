@@ -7,3 +7,10 @@ ShaderImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 127325
+  packageName: Particle Pack | Starter Assets
+  packageVersion: 3.3
+  assetPath: Assets/TextMesh Pro/Shaders/TMP_SDF SSD.shader
+  uploadId: 1015842

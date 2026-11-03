@@ -204,6 +204,7 @@ public class ThirdPersonController : MonoBehaviour
         RotateModel();
         Roll();
         AudioChecks();
+        
 
         //Makes movement obey deadzones
         if (moveInput.magnitude > deadZone)
@@ -241,6 +242,7 @@ public class ThirdPersonController : MonoBehaviour
         if (!controller.isGrounded) //checks for walls while jumping, no need to check them during ground state.
         {
             CheckWall();
+            
         }
 
         if(m_throw.WasPressedThisFrame() && readyToThrow) // throws spear
@@ -661,11 +663,28 @@ public class ThirdPersonController : MonoBehaviour
 
         Rigidbody spearRb = spear.GetComponent<Rigidbody>(); //this grabs the rigidbody component of the spear
 
+        SpearScript spearScript = spear.GetComponent<SpearScript>();
+
         Vector3 forceToAdd = cameraTransform.transform.forward * throwForce + transform.up * throwUpwardForce; //force for the spear's rigidbody
 
         spearRb.AddForce(forceToAdd, ForceMode.Impulse); //applies spear force
 
         Invoke(nameof(ResetThrow), throwCooldown); // starts resetthrow function in whatever time is set for throwcooldown
+
+        if (spearScript != null)
+        {
+            spearScript.Initialize(this.transform);
+        }
+        
+        if (jumped)
+        {
+            
+            spearRb.useGravity = true;
+        }
+        else
+        {
+            spearRb.useGravity = false;
+        }
     }
 
     private void ResetThrow() //resets the throw

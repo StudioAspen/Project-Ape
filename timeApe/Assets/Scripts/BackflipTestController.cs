@@ -75,6 +75,12 @@ public class BackflipTestController : MonoBehaviour
     public float rollDash = 25f;
     public float rollDuration = 0.2f;
 
+    [Header("Dodge")]
+    public float dodgeVelocity = 10f;
+    public float dodgeInvicbilityFrame = 0.1f;
+    public float dodgeDuration = 0.1f;
+
+
     // Crtl Elements
     bool crtlHeld;
 
@@ -116,6 +122,7 @@ public class BackflipTestController : MonoBehaviour
     private bool jumpAudioCheck;
     private bool spinAudioCheck;
     private bool Airlock;
+    private bool isDodging;
  
     private bool rollState;
 
@@ -129,6 +136,8 @@ public class BackflipTestController : MonoBehaviour
 
     private int spinDirection = 0;
 
+    private float dodgeFrames;
+    private float dodgeTimerDuration;
 
     private PlayerInput inputActions;
 
@@ -179,6 +188,21 @@ public class BackflipTestController : MonoBehaviour
         inputActions.Player.Crtl.performed += ctx => crtlHeld = true;
         inputActions.Player.Crtl.canceled += ctx => crtlHeld = false;
 
+        // Connecting Dodge Button
+        inputActions.Player.Dodge.performed += ctx =>
+        {
+            if (!isDodging)
+            {
+                isDodging = true;
+                dodgeTimerDuration = dodgeDuration;
+                dodgeFrames = dodgeInvicbilityFrame;
+                //Turn off hitbox here
+            }
+
+            isDodging = true;
+            Dodge();
+        };
+
         //Connecting Jump press
         inputActions.Player.Jump.performed += ctx =>
         {
@@ -224,6 +248,7 @@ public class BackflipTestController : MonoBehaviour
         WallJumpCheck();
         //AudioChecks();
         DetectSpin();
+        Dodge();
 
         Debug.Log(jumpBufferCounter);
 
@@ -654,6 +679,33 @@ public class BackflipTestController : MonoBehaviour
             velocity.x = 0f;
             velocity.z = 0f;
             Airlock = true;
+        }
+    }
+
+    void Dodge()
+    {
+        if (!isDodging) return;
+
+        dodgeFrames -= Time.deltaTime;
+        if (dodgeFrames < 0.0f)
+        {
+            // Turn on hitbox here
+        }
+
+        launchDirection = MoveDirect();
+        dodgeTimerDuration -= Time.deltaTime;
+
+        if (moveInput.magnitude > deadZone)
+        {
+            velocity = launchDirection * rollDash;
+        }
+        Debug.Log("Dodge");
+
+        if (dodgeTimerDuration < 0.0f)
+        {
+            isDodging = false;
+            velocity.x = 0f;
+            velocity.z = 0f;
         }
     }
     #endregion

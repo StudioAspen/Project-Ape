@@ -1,0 +1,18 @@
+schema_version = "1.0.0"
+
+id = "easy_driver"
+version = "2.0.1"
+name = "Easy Driver"
+tagline = "Technical rigging made easier"
+maintainer = "NeoEmberArts"
+type = "add-on"
+
+blender_version_min = "4.2.0"
+
+license = [
+  "SPDX:GPL-3.0-or-later",
+]
+
+tags = ["Rigging", "Animation"]
+
+website = "https://github.com/NeoEmberArt/EasyDriver"

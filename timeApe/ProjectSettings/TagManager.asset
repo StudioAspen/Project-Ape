@@ -6,6 +6,7 @@ TagManager:
   tags:
   - water
   - Checkpoint
+  - Enemy
   - NPC
   layers:
   - Default

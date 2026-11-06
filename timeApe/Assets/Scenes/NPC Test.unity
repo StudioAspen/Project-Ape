@@ -786,6 +786,8 @@ MonoBehaviour:
   NPCName: Test NPC
   playerTransform: {fileID: 1420657243}
   rotationSpeed: 5
+  inRange: 0
+  isTalking: 0
 --- !u!1 &679730943
 GameObject:
   m_ObjectHideFlags: 0
@@ -1012,6 +1014,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 741642367}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &790859717 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2782907790892054914, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+  m_PrefabInstance: {fileID: 1420657242}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1027936114
 GameObject:
   m_ObjectHideFlags: 0
@@ -1204,13 +1211,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2782907790892054914, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1420657244}
   m_SourcePrefab: {fileID: 100100000, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
 --- !u!4 &1420657243 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5170748891066684639, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
   m_PrefabInstance: {fileID: 1420657242}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1420657244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 790859717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69b017d2671654c619022efdaf2f93ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractController
+  isInteracting: 0
 --- !u!1 &1746104007
 GameObject:
   m_ObjectHideFlags: 0

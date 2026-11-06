@@ -4,36 +4,49 @@ using UnityEngine;
 
 public class NPCSystem : MonoBehaviour, IInteractable
 {
+    public static NPCSystem Instance;
     [SerializeField] private SphereCollider interactCollider;
     public TextMeshProUGUI dialogueText;
     public TextMeshProUGUI NPCNameText;
     public GameObject dialoguePanel;
+    private GameObject player;
     public string dialogueLine;
     public string NPCName;
     public Transform playerTransform;
     public float rotationSpeed = 5f;
     private Coroutine lookAtCoroutine;
-    private bool inRange;
-    private bool isTalking;
+    public bool inRange;
+    public bool isTalking;
+
 
     void Start()
     {
+        if (Instance == null) Instance = this;
         isTalking = false;
         inRange = false;
         dialoguePanel.SetActive(false);
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (inRange) //add input condition when input action is created for interaction
+        if (inRange == true)
         {
-            Interact();
+            if (playerTransform == null) 
+            {
+                if (player != null) playerTransform = player.transform;
+            }
+            if (playerTransform != null)
+            {
+                if (lookAtCoroutine != null) StopCoroutine(lookAtCoroutine);
+
+                lookAtCoroutine = StartCoroutine(LookAtPlayer());
+            }
         }
     }
-
     public void StartDialogue()
     {
+        player.GetComponent<ThirdPersonController>().enabled = false; //disables player movement
         dialoguePanel.SetActive(true);
         dialogueText.text = dialogueLine;
         NPCNameText.text = NPCName;
@@ -41,6 +54,7 @@ public class NPCSystem : MonoBehaviour, IInteractable
 
     public void EndDialogue()
     {
+        player.GetComponent<ThirdPersonController>().enabled = true; //enables player movement
         StopAllCoroutines();
         dialoguePanel.SetActive(false);
         dialogueText.text = "";
@@ -53,19 +67,6 @@ public class NPCSystem : MonoBehaviour, IInteractable
         {
             inRange = true;
             CanInteract();
-            
-            //when within trigger collider, turn and face player
-            if (playerTransform == null) 
-            {
-                GameObject player = GameObject.FindGameObjectWithTag("Player");
-                if (player != null) playerTransform = player.transform;
-            }
-            if (playerTransform != null)
-            {
-                if (lookAtCoroutine != null) StopCoroutine(lookAtCoroutine);
-
-                lookAtCoroutine = StartCoroutine(LookAtPlayer());
-            }
         }
     }
 
@@ -74,7 +75,6 @@ public class NPCSystem : MonoBehaviour, IInteractable
         if (other.gameObject.CompareTag("Player"))
         {
             inRange = false;
-            EndDialogue();
         }
     }
 

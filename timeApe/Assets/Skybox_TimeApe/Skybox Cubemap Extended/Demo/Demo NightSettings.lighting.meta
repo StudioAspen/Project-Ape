@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 949a654bc195c414dae2c3de80682e2d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 107400
+  packageName: FREE Skybox Extended Shader
+  packageVersion: 2.8.0
+  assetPath: Assets/BOXOPHOBIC/Skybox Cubemap Extended/Demo/Demo NightSettings.lighting
+  uploadId: 1016442

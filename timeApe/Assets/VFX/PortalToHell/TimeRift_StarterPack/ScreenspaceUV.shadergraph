@@ -2947,8 +2947,8 @@
     "m_ObjectId": "83feee75a106468b9e14ad2752ed3e61",
     "m_Title": "Cube",
     "m_Position": {
-        "x": -2309.599853515625,
-        "y": 384.7999267578125
+        "x": -2309.60009765625,
+        "y": 385.5999755859375
     }
 }
 
@@ -3950,8 +3950,8 @@
     "m_ObjectId": "b3673d7f4513402aa87d1a360c23e680",
     "m_Title": "PBR Shader",
     "m_Position": {
-        "x": -648.7999267578125,
-        "y": 399.199951171875
+        "x": -648.800048828125,
+        "y": 399.9998779296875
     }
 }
 
@@ -4196,7 +4196,7 @@
     "m_ZTestMode": 4,
     "m_ZWriteControl": 0,
     "m_AlphaMode": 0,
-    "m_RenderFace": 2,
+    "m_RenderFace": 0,
     "m_AlphaClip": false,
     "m_CastShadows": true,
     "m_ReceiveShadows": true,
@@ -5067,7 +5067,7 @@
     "m_ZWriteControl": 0,
     "m_ZTestMode": 4,
     "m_AlphaMode": 0,
-    "m_RenderFace": 2,
+    "m_RenderFace": 0,
     "m_AlphaClip": false,
     "m_CustomEditorGUI": ""
 }

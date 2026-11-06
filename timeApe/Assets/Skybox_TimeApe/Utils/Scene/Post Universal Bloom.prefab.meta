@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c810007b32a1e3d4896ebb8344ae7335
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 107400
+  packageName: FREE Skybox Extended Shader
+  packageVersion: 2.8.0
+  assetPath: Assets/BOXOPHOBIC/Utils/Scene/Post Universal Bloom.prefab
+  uploadId: 1016442

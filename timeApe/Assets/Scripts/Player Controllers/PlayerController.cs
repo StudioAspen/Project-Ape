@@ -1,15 +1,12 @@
-﻿using JetBrains.Annotations;
-using System.Dynamic;
-using System.Runtime.CompilerServices;
-using Unity.VisualScripting;
-using UnityEditor;
+﻿using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.ProBuilder.Shapes;
 using UnityEngine.Rendering;
+using FMODUnity;
+using System.Dynamic;
 
 [RequireComponent(typeof(CharacterController))]
-public class TestThirdPersonController : MonoBehaviour
+public class ThirdPersonController : MonoBehaviour
 {
     #region Variables
     [Header("Camera")]
@@ -20,18 +17,15 @@ public class TestThirdPersonController : MonoBehaviour
     public float gravity = -90f;
     public float jumpHeight = 10f;
     public float jumpRelease = 2.5f;
-
-    [Header("BackFlip")] 
+    [Space(10)] //backflip variables
     public float backflipSpeed = 10f;
     public float backflipHeight = 10f;
-
-    [Header("WallJump")] 
+    [Space(10)] //walljump variables
     public float groundCheckDistance = 2f;
     public float wallCheckDistance = 0.7f;
     public float wallJumpLock = 0.2f;
     public float wallJumpHorizontal = 10f;
     public float wallJumpVertical = 10f;
-    public float wallFriction = -0.9f;
 
     [Header("Movement")]
     public Transform modelTransform; //The Character Model Goes here in the editor
@@ -42,37 +36,32 @@ public class TestThirdPersonController : MonoBehaviour
     public float slowSpeed = 1f;
     public float rotationSpeed = 10f;
     public float modelRotateSpeed = 10f;
-    public Vector2 moveInput;
-    public Vector2 previousStick = Vector2.zero;
-    public Vector3 velocity;
-    public CharacterController controller;
-
-
-    [Header("Skid")]
+    [Space(10)] //skid variables
     public float skidTolerance = -0.7f;
     public float skidDuration = 0.2f;
     public float skidDeceleration = 30f;
-    public static float skidTimer;
-    public static bool isSkidding;
-
 
     [Header("Spin")]
     public float jumpSpinHeight = 20f;
     public float spinAngleTrigger = 720f;
-    public float spinTimeout = 0.3f;
-    public float spinStateLength = 4f;
-    public static float rotationCheck = 0f;
-    public static float angleDelta = 0f;
-    public static float spinStateTimer;
-    public static float spinCooldownTimer;
-    public static bool isSpinning;
-    public static bool wasSpinning;
+    public float spinTimeout = 0.20f;
 
     [Header("Roll")]
     public float rollDash = 25f;
     public float rollDuration = 0.2f;
 
-    /*
+    [Header("Combat")]
+    public GameObject TempSpear;
+    public Transform attackPoint;
+    private InputAction m_throw;
+    public float throwCooldown;
+    public float throwForce;
+    public float throwUpwardForce;
+
+    bool readyToThrow;
+   
+
+
     [Header("Audio Stuff")]
     public GameObject Player;
     FMOD.Studio.EventInstance FootstepsSound;
@@ -95,12 +84,14 @@ public class TestThirdPersonController : MonoBehaviour
     [SerializeField] EventReference RollEvent;
     FMOD.Studio.EventInstance RollSound;
     private float RollTime = 0f;
-    */
+
 
     //private variables
+    private bool isSkidding;
     private bool jumped;
     private bool jumpHold;
     private bool walker;
+    private bool isSpinning = false;
     private bool isBackflipping;
     private bool movementBlocked;
     private bool isTouchingWall;
@@ -110,29 +101,37 @@ public class TestThirdPersonController : MonoBehaviour
     private bool jumpAudioCheck;
     private bool spinAudioCheck;
     private bool Airlock;
- 
     private bool rollState;
 
     private float verticalLookRotation;
     private float speed;
-    
+    private float rotationCheck = 0f;
+    private float spinCooldownTimer = 0f;
     private float clockoyote = 0f;
+    private float skidTimer;
     private float movementBlockTimer;
     private float midSpeed;
     private float rollTimer = 0f;
 
     private int spinDirection = 0;
 
+    private CharacterController controller;
 
     private PlayerInput inputActions;
 
+    private Vector2 moveInput;
     private Vector2 lookInput;
+    private Vector2 previousStick = Vector2.zero;
+    private Vector3 velocity;
     private Vector3 moveDirection;
     private Vector3 lastMoveDirection;
     private Vector3 launchDirection;
     private Vector3 rollDirection;
-    private MeshRenderer mesh;
+
+    private Vector3 checkpointPos; //added
+    private float maxFallDistance = -120f; //added, the distance below which the player will respawn
     #endregion
+
 
     #region Execution Functions
     /*
@@ -141,10 +140,11 @@ public class TestThirdPersonController : MonoBehaviour
 
     void Awake()
     {
+        readyToThrow = true; //throw is ready at the start
         controller = GetComponent<CharacterController>(); //Start taking information from controller input
         inputActions = new PlayerInput();
+        m_throw = InputSystem.actions.FindAction("Throw");
 
-        /*
         //audio variables
         FootstepsSound = FMODUnity.RuntimeManager.CreateInstance(FootstepEvent);
         JumpSound = FMODUnity.RuntimeManager.CreateInstance(JumpEvent);
@@ -152,7 +152,8 @@ public class TestThirdPersonController : MonoBehaviour
         SkidSound = FMODUnity.RuntimeManager.CreateInstance(SkidEvent);
         RollSound = FMODUnity.RuntimeManager.CreateInstance(RollEvent);
         Debug.Log(spinTimeout);
-        */
+
+        checkpointPos = transform.position; //added
     }
 
     void OnEnable()
@@ -187,6 +188,8 @@ public class TestThirdPersonController : MonoBehaviour
         {
             RollDetect();
         };
+        
+        
 
     }
 
@@ -200,42 +203,9 @@ public class TestThirdPersonController : MonoBehaviour
         RotateCamera();
         RotateModel();
         Roll();
-        MoveDirectCheck();
-        ApplyGravity();
-        MoveanBlockCheck();
-        CoyoteTimeCheck();
-        WallJumpCheck();
-        //AudioChecks();
-        DetectSpin();
-    }
-    #endregion
+        AudioChecks();
+        
 
-    #region Movement Checks 
-    void MoveanBlockCheck()
-    {
-        if (movementBlocked) //if the boolean is not on, allow player to move by ignoring this function
-        {
-            StartMoveanBlock();
-        }
-        else // if there is no blockage move as usual
-        {
-            Move();
-        }
-    }
-
-    void WallJumpCheck()
-    {
-        isNearGround = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance); //checks if the player is near ground;
-        Debug.DrawLine(transform.position, transform.transform.position + Vector3.down, Color.blue);
-
-        if (!controller.isGrounded) //checks for walls while jumping, no need to check them during ground state.
-        {
-            StartCheckWall();
-        }
-    }
-
-    void MoveDirectCheck()
-    {
         //Makes movement obey deadzones
         if (moveInput.magnitude > deadZone)
         {
@@ -245,9 +215,18 @@ public class TestThirdPersonController : MonoBehaviour
         {
             moveDirection = Vector3.zero;
         }
-    }
-    void CoyoteTimeCheck()
-    {
+
+        ApplyGravity();
+
+        if (movementBlocked) //if the boolean is not on, allow player to move by ignoring this function
+        {
+            MoveanBlock();
+        }
+        else // if there is no blockage move as usual
+        {
+            Move();
+        }
+
         //defines coyote time to jump
         if (controller.isGrounded || !jumped)
         {
@@ -257,28 +236,83 @@ public class TestThirdPersonController : MonoBehaviour
         {
             clockoyote -= Time.deltaTime;
         }
+
+        isNearGround = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance); //checks if the player is near ground
+
+        if (!controller.isGrounded) //checks for walls while jumping, no need to check them during ground state.
+        {
+            CheckWall();
+            
+        }
+
+        if(m_throw.WasPressedThisFrame() && readyToThrow) // throws spear
+        {
+            Attack();
+        }
+
+        DetectSpin();
+
+        if(transform.position.y < maxFallDistance) //added for death and respawn, currently -120f is the death threshold, can be changed to any value
+        {
+            Respawn();
+        }
+
+        //for updating checkpoint position when player reaches a new one
+        // if (#touching checkpoint)
+        // {
+        //     Vector3 newCheckpointPosition = transform.position; //or the position of the checkpoint object
+        //     checkpointPos = newCheckpointPosition;
+        // }
     }
     #endregion
 
-    #region Main Movement Functions
+    //added for checkpoint collision detection
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.gameObject.CompareTag("Checkpoint"))
+        {
+            Vector3 newCheckpointPosition = transform.position; //or the position of the checkpoint object
+            checkpointPos = newCheckpointPosition;
+            Debug.Log("Checkpoint reached!");
+        }
+
+        if (hit.gameObject.CompareTag("water")) //added for dying when touching water
+        {
+            Respawn();
+        }
+    }
+
+
+    //added, respawn method
+    public void Respawn()
+    {
+        transform.position = checkpointPos;
+        velocity = Vector3.zero;
+    }
+
+    #region Main Functions
+    /*
+     --------------------------------------- MAIN FUNCTIONS ----------------------------------------------------------------------------------
+     */
 
     Vector3 MoveDirect() //RESPONSIBLE OF HORIZONTAL MOVEMENT
     {
-        Vector3 forward = cameraTransform.forward;
-        Vector3 right = cameraTransform.right;
-
-        forward.y = 0f;
-        right.y = 0f;
-        forward.Normalize();
-        right.Normalize();
-
         if (isBackflipping || isWallJumping) //ignore user's joystick direction while backflipping
         {
             return launchDirection;
         }
 
+        //Making movement based on camera perception
+        Vector3 forward = cameraTransform.forward;
+        Vector3 right = cameraTransform.right;
+        //set vertical values 0 and normalize them, this is more a preventive measurement
+        forward.y = 0f;
+        right.y = 0f;
+        forward.Normalize();
+        right.Normalize();
         return (forward * moveInput.y + right * moveInput.x).normalized;
     }
+
 
     void Move() //HANDLES HORIZONTAL MOVEMENT SPEED
     {
@@ -341,18 +375,16 @@ public class TestThirdPersonController : MonoBehaviour
         }
     }
 
+
     void ApplyGravity() //HANDLES VERTICAL SPEED
     {
-        Debug.Log(isNearGround);
         //this resets vertical speed when a player collides with a ceiling
         CollisionFlags flags = controller.Move(velocity * Time.deltaTime * 2f);
-        
         if ((flags & CollisionFlags.Above) != 0 && velocity.y > 0)
         {
             velocity.y = 0f;
             movementBlockTimer = 0f; //interrupts special jumps if a wall is hit
         }
-        
 
         //this maintains the player grounded
         if (controller.isGrounded && velocity.y < 0)
@@ -370,33 +402,25 @@ public class TestThirdPersonController : MonoBehaviour
         {
             velocity.y += gravity * Time.deltaTime;
         }
-
-        if (isTouchingWall && velocity.y < -3f)
-        {
-            velocity.y += gravity * wallFriction * Time.deltaTime;
-        }
     }
+
 
     void Jump() //HANDLES CHANGES IN VERTICAL SPEED CAUSED BY JUMPING
     {
-        StartCheckWall(); //checks for walls during movement lock.
+        CheckWall(); //checks for walls during movement lock.
 
         //WALL JUMP (only next to a wall and far from ground)
-        if (isTouchingWall && !isNearGround)
+        if (isTouchingWall && jumped && !isNearGround)
         {
-            if (jumped)
-            {
-                jumped = true;
-                jumpAudioCheck = true;
-                isWallJumping = true;
-                velocity = launchDirection * wallJumpHorizontal;
-                velocity.y = wallJumpVertical;
-            }
-
+            jumped = true;
+            jumpAudioCheck = true;
             clockoyote = 0f;
+
             movementBlocked = true;
+            isWallJumping = true;
             movementBlockTimer = wallJumpLock;
-            
+            velocity = launchDirection * wallJumpHorizontal;
+            velocity.y = wallJumpVertical;
             return;
         }
 
@@ -405,7 +429,7 @@ public class TestThirdPersonController : MonoBehaviour
         {
 
             //SPIN JUMP (only in ground and needs to be spinning)
-            if (isSpinning)
+            if (isSpinning && controller.isGrounded)
             {
                 velocity.y = Mathf.Sqrt(jumpSpinHeight * -2f * gravity);
                 jumped = true;
@@ -436,72 +460,73 @@ public class TestThirdPersonController : MonoBehaviour
             rotationCheck = 0f;
             spinDirection = 0;
             previousStick = Vector2.zero;
-            spinStateTimer = spinStateLength;
         }
     }
 
 
-    void DetectSpin()
+    void DetectSpin() //DETECTS IF THE PLAYER IS ATTEMPTING TO GET INTO THE SPINNING STATE
     {
-        if (IsGroundedSphere())
+        if (controller.isGrounded)
         {
-            angleDelta = Vector2.SignedAngle(previousStick, moveInput); //storing spin angle
-
-            if (Mathf.Abs(angleDelta) > 1f && previousStick != Vector2.zero)
+            if (moveInput.magnitude < 0.7f) //resets spin detection if rotation isn't fast enough
             {
-                int currentDirection = angleDelta > 0 ? 1 : -1;
-
-                if (spinDirection == 0) //detects beginning of spin
-                {
-                    spinDirection = currentDirection;
-                    spinCooldownTimer = spinTimeout;
-                }
-
-                if (currentDirection == spinDirection && !isSpinning) //checks if the joystick goes to the same direction, if it does, add to the spin charge
-                {
-                    rotationCheck += Mathf.Abs(angleDelta);
-                    spinCooldownTimer -= Time.deltaTime;
-
-                    if (spinCooldownTimer < 0f)
-                    {
-                        rotationCheck = 0f;
-                        spinCooldownTimer = spinTimeout;
-                        spinDirection = currentDirection;
-                    }
-                }
-                else //if not reset the charge
-                {
-                    rotationCheck = 0f;
-                    spinDirection = currentDirection;
-                    spinCooldownTimer = spinTimeout;
-                }
-
-                if (rotationCheck >= spinAngleTrigger)
-                {
-                    isSpinning = true;
-
-                    return;
-                }
-            }
-        }
-        previousStick = moveInput;
-
-        if (isSpinning)
-        {
-            spinStateTimer -= Time.deltaTime;
-
-            if (spinStateTimer < 0f)
-            {
-                isSpinning = false;
+                previousStick = Vector2.zero;
                 rotationCheck = 0f;
                 spinDirection = 0;
-                previousStick = Vector2.zero;
-                spinStateTimer = spinStateLength;
-
+                isSpinning = false;
+                spinCooldownTimer = 0f;
                 return;
             }
+
+            if (previousStick != Vector2.zero) //detects when player is moving joystick
+            {
+                float angleDelta = Vector2.SignedAngle(previousStick, moveInput); //storing spin angle
+
+                if (Mathf.Abs(angleDelta) > 2f)
+                {
+                    int currentDirection = angleDelta > 0 ? 1 : -1;
+
+                    if (spinDirection == 0) //detects beginning of spin
+                    {
+                        spinDirection = currentDirection;
+                        spinCooldownTimer = spinTimeout;
+                        spinAudioCheck = true;
+                    }
+
+                    if (currentDirection == spinDirection) //checks if the joystick goes to the same direction, if it does, add to the spin charge
+                    {
+                        rotationCheck += Mathf.Abs(angleDelta);
+                    }
+                    else //if not reset the charge
+                    {
+                        rotationCheck = 0f;
+                        spinDirection = currentDirection;
+                        spinCooldownTimer = spinTimeout;
+                        spinAudioCheck = true;
+                    }
+                }
+
+                if (spinCooldownTimer != 0)
+                {
+                    spinCooldownTimer -= Time.deltaTime;
+                }
+
+                if (spinCooldownTimer <= 0f) //will not trigger the spin if the spin action is too slow, prvents it from triggering during a normal turn
+                {
+                    isSpinning = false;
+                    spinDirection = 0;
+                    rotationCheck = 0;
+                }
+
+                if ((rotationCheck) >= spinAngleTrigger)
+                {
+                    isSpinning = true;
+                }
+            }
+            previousStick = moveInput;
         }
     }
+
 
     void RotateCamera() //RESPONSIBLE OF THE CAMERA ROTATION AROUND THE MODEL.
     {
@@ -515,20 +540,19 @@ public class TestThirdPersonController : MonoBehaviour
         verticalLookRotation -= mouseY;
         verticalLookRotation = Mathf.Clamp(verticalLookRotation, -70f, 70f);
 
-        cameraTransform.localRotation = Quaternion.Euler(verticalLookRotation, 0f, 0f);
+        cameraTransform.localRotation =
+            Quaternion.Euler(verticalLookRotation, 0f, 0f);
     }
 
 
     void RotateModel() //RESPONSIBLE OF ROTATING THE MODEL ACCORDING TO THE DIRECTION THE PLAYER IS MOVING
     {
-
         if (moveDirection.magnitude > 0.1f && !isBackflipping) //Moves only when joystick is tilted OR blocks when the player is doing a backflip
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
 
             modelTransform.rotation = Quaternion.Slerp(modelTransform.rotation, targetRotation, modelRotateSpeed * Time.deltaTime);
         }
-        
     }
 
 
@@ -537,7 +561,7 @@ public class TestThirdPersonController : MonoBehaviour
         //prevents extra movements and extra jumps during the backflip
         jumped = true;
         clockoyote = 0f;
-        launchDirection = MoveDirect(); 
+        launchDirection = MoveDirect();
 
         //begins block movement and sets the timer
         movementBlocked = true;
@@ -550,7 +574,7 @@ public class TestThirdPersonController : MonoBehaviour
         velocity.z = launchDirection.z * backflipSpeed;
     }
 
-    void StartMoveanBlock() //RESPONSIBLE OF BLOCKING USER MOVEMENT WHEN PERFORMING CERTAIN TYPES OF JUMPS
+    void MoveanBlock() //RESPONSIBLE OF BLOCKING USER MOVEMENT WHEN PERFORMING CERTAIN TYPES OF JUMPS
     {
 
         movementBlockTimer -= Time.deltaTime; //start the blocked movement period
@@ -579,22 +603,21 @@ public class TestThirdPersonController : MonoBehaviour
                 velocity.z = 0f;
                 launchDirection = Vector3.zero;
             }
+
         }
     }
 
 
-    void StartCheckWall() //RESPONSIBLE OF CHECKING IF THE PLAYER IS TOUCHING A WALL
+    void CheckWall() //RESPONSIBLE OF CHECKING IF THE PLAYER IS TOUCHING A WALL
     {
         isTouchingWall = false;
 
         Vector3 origin = transform.position + Vector3.up;
 
-        Debug.DrawLine(origin, origin + modelTransform.forward, Color.red);
         if (Physics.Raycast(origin, modelTransform.forward, out RaycastHit hit, wallCheckDistance)) //the raycast checks if there is a wall
         {
             isTouchingWall = true;
             launchDirection = hit.normal;
-
         }
     }
 
@@ -630,70 +653,51 @@ public class TestThirdPersonController : MonoBehaviour
             Airlock = true;
         }
     }
-    #endregion
 
-    #region Ground Check Functions
-
-    Vector3 SphereCastOrigin()
+    private void Attack() // SHOOTS SPEAR
     {
-        Vector3 origin = transform.position + (Vector3.up * 0.5f);
 
-        return origin;
-    }
+        readyToThrow = false; //so it cannot be spammed
 
-    Vector3 RayCastOrigin()
-    {
-        Vector3 origin = transform.position + (Vector3.up * 0.3f);
+        GameObject spear = Instantiate(TempSpear, attackPoint.position, cameraTransform.rotation); //this is what creates the spear at the attackpoint
 
-        return origin;
-    }
+        Rigidbody spearRb = spear.GetComponent<Rigidbody>(); //this grabs the rigidbody component of the spear
 
-    public bool IsGrounded()
-    {
-        float rayDistance = 0.6f;
-        Vector3 debugRayEnd = RayCastOrigin() + (Vector3.down * rayDistance);
+        SpearScript spearScript = spear.GetComponent<SpearScript>();
 
-        Debug.DrawLine(RayCastOrigin(), debugRayEnd, Color.blue);
-        if (Physics.Raycast(RayCastOrigin(), Vector3.down, rayDistance))
+        Vector3 forceToAdd = cameraTransform.transform.forward * throwForce + transform.up * throwUpwardForce; //force for the spear's rigidbody
+
+        spearRb.AddForce(forceToAdd, ForceMode.Impulse); //applies spear force
+
+        Invoke(nameof(ResetThrow), throwCooldown); // starts resetthrow function in whatever time is set for throwcooldown
+
+        if (spearScript != null)
         {
-            return true;
+            spearScript.Initialize(this.transform);
+        }
+        
+        if (jumped)
+        {
+            
+            spearRb.useGravity = true;
         }
         else
         {
-            return false;
+            spearRb.useGravity = false;
         }
     }
 
-    public bool IsGroundedSphere()
+    private void ResetThrow() //resets the throw
     {
-        float rayDistance = 0.8f;
-
-        if (Physics.SphereCast(SphereCastOrigin(), controller.radius - 0.4f, Vector3.down, out RaycastHit hitInfo, rayDistance))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        readyToThrow = true;
     }
-
-    void OnDrawGizmos()
-    {
-        if (IsGroundedSphere())
-        {
-            Gizmos.DrawSphere(SphereCastOrigin(), controller.radius - 0.4f);
-        }
-    }
-
     #endregion
+
 
     #region Audio Functions
     /*
          --------------------------------------- AUDIO FUNCTIONS ----------------------------------------------------------------------------------
          */
-
-    /*
     void AudioChecks() //contains all the checks for movement sounds
     {
         StepTime += Time.deltaTime;
@@ -728,7 +732,6 @@ public class TestThirdPersonController : MonoBehaviour
 
         if (isSpinning && spinAudioCheck)
         {
-            Debug.Log("i");
             SpinSound.start();
             spinAudioCheck = false;
         }
@@ -766,6 +769,5 @@ public class TestThirdPersonController : MonoBehaviour
             RollSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         }
     }
-    */
     #endregion
 }

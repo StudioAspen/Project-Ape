@@ -31,7 +31,8 @@ public class TestThirdPersonController : MonoBehaviour
     public float wallJumpLock = 0.2f;
     public float wallJumpHorizontal = 10f;
     public float wallJumpVertical = 10f;
-    public float wallFriction = -0.9f;
+    public float wallFrictionAmount = -0.9f;
+    public float wallFrictionTime = 0.8f;
 
     [Header("Movement")]
     public Transform modelTransform; //The Character Model Goes here in the editor
@@ -46,7 +47,6 @@ public class TestThirdPersonController : MonoBehaviour
     public Vector2 previousStick = Vector2.zero;
     public Vector3 velocity;
     public CharacterController controller;
-
 
     [Header("Skid")]
     public float skidTolerance = -0.7f;
@@ -110,7 +110,9 @@ public class TestThirdPersonController : MonoBehaviour
     private bool jumpAudioCheck;
     private bool spinAudioCheck;
     private bool Airlock;
- 
+    private float wallFrictionTimer;
+    private float wallFriction;
+
     private bool rollState;
 
     private float verticalLookRotation;
@@ -205,8 +207,15 @@ public class TestThirdPersonController : MonoBehaviour
         MoveanBlockCheck();
         CoyoteTimeCheck();
         WallJumpCheck();
-        //AudioChecks();
         DetectSpin();
+
+        //unit test
+        {
+            if (velocity.y < -25f)
+            {
+                Debug.Log("Yo");
+            }
+        }
     }
     #endregion
 
@@ -226,7 +235,6 @@ public class TestThirdPersonController : MonoBehaviour
     void WallJumpCheck()
     {
         isNearGround = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance); //checks if the player is near ground;
-        Debug.DrawLine(transform.position, transform.transform.position + Vector3.down, Color.blue);
 
         if (!controller.isGrounded) //checks for walls while jumping, no need to check them during ground state.
         {
@@ -343,7 +351,6 @@ public class TestThirdPersonController : MonoBehaviour
 
     void ApplyGravity() //HANDLES VERTICAL SPEED
     {
-        Debug.Log(isNearGround);
         //this resets vertical speed when a player collides with a ceiling
         CollisionFlags flags = controller.Move(velocity * Time.deltaTime * 2f);
         
@@ -373,7 +380,19 @@ public class TestThirdPersonController : MonoBehaviour
 
         if (isTouchingWall && velocity.y < -3f)
         {
+            wallFrictionTimer -= Time.deltaTime;
             velocity.y += gravity * wallFriction * Time.deltaTime;
+
+            if (wallFrictionTimer < 0f)
+            {
+                wallFriction = 1f;
+                return;
+            }
+        }
+        else
+        {
+            wallFrictionTimer = wallFrictionTime;
+            wallFriction = wallFrictionAmount;
         }
     }
 
@@ -467,6 +486,8 @@ public class TestThirdPersonController : MonoBehaviour
                         rotationCheck = 0f;
                         spinCooldownTimer = spinTimeout;
                         spinDirection = currentDirection;
+
+                        return;
                     }
                 }
                 else //if not reset the charge

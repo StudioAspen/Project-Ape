@@ -796113,7 +796113,8 @@ MonoBehaviour:
   wallJumpLock: 0.2
   wallJumpHorizontal: 11
   wallJumpVertical: 15
-  wallFriction: -0.95
+  wallFrictionAmount: -0.9
+  wallFrictionTime: 0.2
   modelTransform: {fileID: 214252505}
   acceleration: 100
   blockedTimer: 1
@@ -1030824,7 +1030825,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5170748891066684639, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 113.8
+      value: 105.68
       objectReference: {fileID: 0}
     - target: {fileID: 5170748891066684639, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       propertyPath: m_LocalPosition.z

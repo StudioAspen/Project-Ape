@@ -5,6 +5,8 @@ using UnityEngine.Rendering;
 using FMODUnity;
 using System.Dynamic;
 using Unity.VectorGraphics;
+using Unity.Mathematics;
+
 
 
 [RequireComponent(typeof(CharacterController))]
@@ -59,9 +61,12 @@ public class ThirdPersonController : MonoBehaviour
     public float throwCooldown;
     public float throwForce;
     public float throwUpwardForce;
+    public string enemyTag = "Enemy";
 
     bool readyToThrow;
     bool lockOnEnabled;
+    private float lockOnRange = 20f;
+    public Transform target;
     
    
 
@@ -158,7 +163,8 @@ public class ThirdPersonController : MonoBehaviour
         Debug.Log(spinTimeout);
 
         checkpointPos = transform.position; //added
-        lockOnEnabled = false;
+        
+        InvokeRepeating("EnemyCheck", 0f, 0.5f); // this is for the enemy check, it calculates distance so this is a safety measure for performance
     }
 
     void OnEnable()
@@ -209,7 +215,7 @@ public class ThirdPersonController : MonoBehaviour
         RotateModel();
         Roll();
         AudioChecks();
-        EnemyCheck();
+        
         
 
         //Makes movement obey deadzones
@@ -261,6 +267,11 @@ public class ThirdPersonController : MonoBehaviour
         if(transform.position.y < maxFallDistance) //added for death and respawn, currently -120f is the death threshold, can be changed to any value
         {
             Respawn();
+        }
+
+        if (target == null)
+        {
+            return;
         }
 
         //for updating checkpoint position when player reaches a new one
@@ -664,17 +675,18 @@ public class ThirdPersonController : MonoBehaviour
     {
 
         readyToThrow = false; //so it cannot be spammed
-
         GameObject spear = Instantiate(TempSpear, attackPoint.position, cameraTransform.rotation); //this is what creates the spear at the attackpoint
-
         Rigidbody spearRb = spear.GetComponent<Rigidbody>(); //this grabs the rigidbody component of the spear
-
         SpearScript spearScript = spear.GetComponent<SpearScript>();
 
-        Vector3 forceToAdd = cameraTransform.transform.forward * throwForce + transform.up * throwUpwardForce; //force for the spear's rigidbody
+        Vector3 forceDirection = cameraTransform.transform.forward;
+        RaycastHit hit;
 
-        spearRb.AddForce(forceToAdd, ForceMode.Impulse); //applies spear force
-
+        if (Physics.Raycast(cameraTransform.position,cameraTransform.forward, out hit, 500f))
+        {
+            forceDirection = (hit.point - attackPoint.position).normalized;
+        }
+        
         Invoke(nameof(ResetThrow), throwCooldown); // starts resetthrow function in whatever time is set for throwcooldown
 
         if (spearScript != null)
@@ -691,6 +703,16 @@ public class ThirdPersonController : MonoBehaviour
         {
             spearRb.useGravity = false;
         }
+        if (target != null)
+        {
+            Vector3 dir = (target.position - transform.position).normalized * throwForce;
+            spearRb.AddForce(dir,ForceMode.Impulse);
+        }
+        else
+        {
+            Vector3 forceToAdd = forceDirection * throwForce + transform.up * throwUpwardForce; //force for the spear's rigidbody
+            spearRb.AddForce(forceToAdd, ForceMode.Impulse);
+        }
     }
 
     private void ResetThrow() //resets the throw
@@ -698,20 +720,36 @@ public class ThirdPersonController : MonoBehaviour
         readyToThrow = true;
     }
 
-    private void EnemyCheck()
-    {   
-        Vector3 p = transform.position + controller.center;
-        RaycastHit hit;
-        
+    void OnDrawGizmosSelected()
+    {
+        //for testing the range of the lock on
+        //Gizmos.color = Color.red;
+        //Gizmos.DrawWireSphere(transform.position, lockOnRange);
+    }
 
-        if (Physics.SphereCast(p,controller.height / 2 * 5,transform.forward, out hit, 8))
-        {   
-            lockOnEnabled = true;
-            Debug.Log(lockOnEnabled);
+    void EnemyCheck()
+    {   
+
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag(enemyTag); // grabs gameobjects with enemy tag
+        float shortestDistance = Mathf.Infinity;
+        GameObject nearestEnemy = null;
+
+        foreach (GameObject enemy in enemies)
+        {
+            float distanceToEnemy = Vector3.Distance(transform.position, enemy.transform.position);
+            if (distanceToEnemy < shortestDistance) // calculates the closest enemy
+            {
+                shortestDistance = distanceToEnemy;
+                nearestEnemy = enemy;
+            }
+        }
+        if (nearestEnemy != null && shortestDistance <= lockOnRange)
+        {
+            target = nearestEnemy.transform; //assigns target from the result of the above if statement and can be used anywhere on this script
         }
         else
         {
-            lockOnEnabled = false;
+            target = null;
         }
     }
     #endregion

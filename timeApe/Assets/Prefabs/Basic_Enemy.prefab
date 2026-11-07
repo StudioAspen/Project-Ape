@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5311201740832835006}
   m_Layer: 0
   m_Name: Basic_Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -116,11 +116,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
   goal: {fileID: 0}
   agent: {fileID: 0}
-  attack_range: 10
   detect_range: 10
   cooldown: 3
   lunge_speed: 3
   loitering_radius: 4
+  loitering_speed: 0.8
 --- !u!1001 &8245614076348680666
 PrefabInstance:
   m_ObjectHideFlags: 0

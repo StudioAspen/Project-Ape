@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 using FMODUnity;
 using System.Dynamic;
+using Unity.VectorGraphics;
+
 
 [RequireComponent(typeof(CharacterController))]
 public class ThirdPersonController : MonoBehaviour
@@ -59,6 +61,8 @@ public class ThirdPersonController : MonoBehaviour
     public float throwUpwardForce;
 
     bool readyToThrow;
+    bool lockOnEnabled;
+    
    
 
 
@@ -154,6 +158,7 @@ public class ThirdPersonController : MonoBehaviour
         Debug.Log(spinTimeout);
 
         checkpointPos = transform.position; //added
+        lockOnEnabled = false;
     }
 
     void OnEnable()
@@ -204,6 +209,7 @@ public class ThirdPersonController : MonoBehaviour
         RotateModel();
         Roll();
         AudioChecks();
+        EnemyCheck();
         
 
         //Makes movement obey deadzones
@@ -690,6 +696,23 @@ public class ThirdPersonController : MonoBehaviour
     private void ResetThrow() //resets the throw
     {
         readyToThrow = true;
+    }
+
+    private void EnemyCheck()
+    {   
+        Vector3 p = transform.position + controller.center;
+        RaycastHit hit;
+        
+
+        if (Physics.SphereCast(p,controller.height / 2 * 5,transform.forward, out hit, 8))
+        {   
+            lockOnEnabled = true;
+            Debug.Log(lockOnEnabled);
+        }
+        else
+        {
+            lockOnEnabled = false;
+        }
     }
     #endregion
 

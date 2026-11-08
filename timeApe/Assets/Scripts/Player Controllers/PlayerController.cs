@@ -9,6 +9,7 @@ using Unity.Mathematics;
 
 
 
+
 [RequireComponent(typeof(CharacterController))]
 public class ThirdPersonController : MonoBehaviour
 {
@@ -682,7 +683,10 @@ public class ThirdPersonController : MonoBehaviour
         Vector3 forceDirection = cameraTransform.transform.forward;
         RaycastHit hit;
 
-        if (Physics.Raycast(cameraTransform.position,cameraTransform.forward, out hit, 500f))
+
+
+        
+        if (Physics.Raycast(cameraTransform.position,cameraTransform.forward, out hit, 500f)) // using raycast for more accurate shooting outside the lock-on
         {
             forceDirection = (hit.point - attackPoint.position).normalized;
         }
@@ -705,8 +709,13 @@ public class ThirdPersonController : MonoBehaviour
         }
         if (target != null)
         {
-            Vector3 dir = (target.position - transform.position).normalized * throwForce;
+            Vector3 dir = (target.position - attackPoint.position).normalized * throwForce;
+            Quaternion lookRotation = Quaternion.LookRotation(dir);
+            Vector3 rotation = lookRotation.eulerAngles;
+            spearRb.rotation = lookRotation;
+            
             spearRb.AddForce(dir,ForceMode.Impulse);
+
         }
         else
         {

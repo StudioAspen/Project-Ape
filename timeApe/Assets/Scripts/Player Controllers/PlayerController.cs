@@ -686,7 +686,7 @@ public class ThirdPersonController : MonoBehaviour
 
 
         
-        if (Physics.Raycast(cameraTransform.position,cameraTransform.forward, out hit, 500f)) // using raycast for more accurate shooting outside the lock-on
+        if (Physics.Raycast(cameraTransform.position,cameraTransform.forward, out hit, 500f, 8)) // using raycast for more accurate shooting outside the lock-on
         {
             forceDirection = (hit.point - attackPoint.position).normalized;
         }

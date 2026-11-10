@@ -10,12 +10,16 @@ using Unity.Mathematics;
 
 
 
+
+
 [RequireComponent(typeof(CharacterController))]
 public class ThirdPersonController : MonoBehaviour
 {
     #region Variables
     [Header("Camera")]
     public Transform cameraTransform; //The Camera pivot goes here in editor
+    private float lockOnSpeed = 10f;
+    
 
     [Header("Jumping")]
     public float coyoteTimer = 0.2f;
@@ -63,11 +67,12 @@ public class ThirdPersonController : MonoBehaviour
     public float throwForce;
     public float throwUpwardForce;
     public string enemyTag = "Enemy";
-
+    private InputAction m_aim;
     bool readyToThrow;
     bool lockOnEnabled;
     private float lockOnRange = 20f;
     public Transform target;
+    private float spearHeightOffset = 5.5f;
     
    
 
@@ -154,6 +159,7 @@ public class ThirdPersonController : MonoBehaviour
         controller = GetComponent<CharacterController>(); //Start taking information from controller input
         inputActions = new PlayerInput();
         m_throw = InputSystem.actions.FindAction("Throw");
+        m_aim = InputSystem.actions.FindAction("Aim");
 
         //audio variables
         FootstepsSound = FMODUnity.RuntimeManager.CreateInstance(FootstepEvent);
@@ -262,6 +268,7 @@ public class ThirdPersonController : MonoBehaviour
         {
             Attack();
         }
+
 
         DetectSpin();
 
@@ -560,6 +567,11 @@ public class ThirdPersonController : MonoBehaviour
 
         cameraTransform.localRotation =
             Quaternion.Euler(verticalLookRotation, 0f, 0f);
+
+        if(m_aim.IsPressed() && target != null) // applies to the camera rotation so fits here more than the update function
+        {
+           CameraLockOn(); // handles the camera lock on
+        }
     }
 
 
@@ -709,7 +721,7 @@ public class ThirdPersonController : MonoBehaviour
         }
         if (target != null)
         {
-            Vector3 dir = (target.position - attackPoint.position).normalized * throwForce;
+            Vector3 dir = (target.position - attackPoint.position).normalized * throwForce + (Vector3.up * spearHeightOffset);
             Quaternion lookRotation = Quaternion.LookRotation(dir);
             Vector3 rotation = lookRotation.eulerAngles;
             spearRb.rotation = lookRotation;
@@ -760,6 +772,13 @@ public class ThirdPersonController : MonoBehaviour
         {
             target = null;
         }
+    }
+
+    void CameraLockOn()
+    {
+        Vector3 aimDir = (target.position - transform.position).normalized;
+        Quaternion rotation = Quaternion.LookRotation(aimDir);
+        cameraTransform.rotation = Quaternion.Lerp(cameraTransform.rotation,rotation,lockOnSpeed);
     }
     #endregion
 

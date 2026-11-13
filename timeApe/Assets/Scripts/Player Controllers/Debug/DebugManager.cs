@@ -13,7 +13,7 @@ public class DebugManager : MonoBehaviour
     private Gamepad controller;
 
     [Header("Component References")]
-    private TestThirdPersonController player;
+    private PlayerController player;
 
     void Start()
     {
@@ -22,7 +22,7 @@ public class DebugManager : MonoBehaviour
         spinDebugText.enabled = false;
         skiddingDebugText.enabled = false;
 
-        player = FindAnyObjectByType<TestThirdPersonController>();
+        player = FindAnyObjectByType<PlayerController>();
     }
 
     void Update()
@@ -55,17 +55,17 @@ public class DebugManager : MonoBehaviour
             spinDebugText.text = $"|SPIN STATE DEBUG| \n" +
                 $"Jump velocity: {player.velocity.y} \n" +
                 $"Angle between current input \n" +
-                $"and previous input: {TestThirdPersonController.angleDelta} \n" +
+                $"and previous input: {player.angleDelta} \n" +
                 $"Current input: {player.moveInput} \n" +
                 $"Current input magnitude/length: {player.moveInput.sqrMagnitude} \n" +
                 $"Previous input: {player.previousStick} \n" +
-                $"Rotation check: {TestThirdPersonController.rotationCheck} \n" +
+                $"Rotation check: {player.rotationCheck} \n" +
                 $"Spin state trigger angle: {player.spinAngleTrigger} \n" +
-                $"Is player spinning: {TestThirdPersonController.isSpinning} \n" +
-                $"Spin cooldown timer: {TestThirdPersonController.spinCooldownTimer} \n" +
+                $"Is player spinning: {player.isSpinning} \n" +
+                $"Spin cooldown timer: {player.spinCooldownTimer} \n" +
                 $"Character controller grounded: {player.controller.isGrounded} \n" +
                 $"Sphere grounded: {player.IsGroundedSphere()} \n" +
-                $"Spin state length timer: {TestThirdPersonController.spinStateTimer} ";
+                $"Spin state length timer: {player.spinStateTimer} ";
             
         return;
     }
@@ -76,8 +76,8 @@ public class DebugManager : MonoBehaviour
                 $"Skid Tolerance: {player.skidTolerance} \n" +
                 $"Skid Duration: {player.skidDuration} \n" +
                 $"Skid Deceleration: {player.skidDeceleration} \n" +
-                $"Skid Timer: {TestThirdPersonController.skidTimer} \n" +
-                $"Is Skidding: {TestThirdPersonController.isSkidding}";
+                $"Skid Timer: {player.skidTimer} \n" +
+                $"Is Skidding: {player.isSkidding}";
 
         return;
     }

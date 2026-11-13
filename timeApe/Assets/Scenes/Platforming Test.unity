@@ -209433,12 +209433,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 0}
+    - {fileID: 902052519996820736, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 9024033431116226236, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       insertIndex: 0
       addedObject: {fileID: 104172218}
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2782907790892054914, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1829936779}
     - targetCorrespondingSourceObject: {fileID: 1936230099883026936, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 95831526}
@@ -376661,6 +376665,66 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
+--- !u!1 &1829936778 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2782907790892054914, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+  m_PrefabInstance: {fileID: 883636331}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1829936779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1829936778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3d453a426e246f4a8635b24d62ec900, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  coyoteTimer: 0.2
+  gravity: -50
+  jumpHeight: 2.5
+  jumpRelease: 2.5
+  backflipSpeed: 8
+  backflipHeight: 5
+  jumpBufferTime: 0.3
+  backflipGraceTime: 0.15
+  groundCheckDistance: 2
+  wallCheckDistance: 1.2
+  wallJumpLock: 0.2
+  wallJumpHorizontal: 11
+  wallJumpVertical: 15
+  wallFrictionAmount: -0.95
+  wallFrictionTime: 0.2
+  modelTransform: {fileID: 151977022}
+  acceleration: 100
+  blockedTimer: 1
+  deadZone: 0.3
+  fastSpeed: 15
+  slowSpeed: 1
+  rotationSpeed: 15
+  modelRotateSpeed: 10
+  moveInput: {x: 0, y: 0}
+  previousStick: {x: 0, y: 0}
+  velocity: {x: 0, y: 0, z: 0}
+  controller: {fileID: 0}
+  skidTolerance: -0.7
+  skidDuration: 0.1
+  skidDeceleration: 100
+  skidTimer: 0
+  isSkidding: 0
+  jumpSpinHeight: 6.5
+  spinAngleTrigger: 720
+  spinTimeout: 0.6
+  spinStateLength: 4
+  rotationCheck: 0
+  angleDelta: 0
+  spinStateTimer: 0
+  spinCooldownTimer: 0
+  isSpinning: 0
+  rollDash: 25
+  rollDuration: 0.2
 --- !u!43 &1841844293
 Mesh:
   m_ObjectHideFlags: 0

@@ -46,7 +46,7 @@ public class NPCSystem : MonoBehaviour, IInteractable
     }
     public void StartDialogue()
     {
-        player.GetComponent<ThirdPersonController>().enabled = false; //disables player movement
+        player.GetComponent<PlayerController>().enabled = false; //disables player movement
         dialoguePanel.SetActive(true);
         dialogueText.text = dialogueLine;
         NPCNameText.text = NPCName;
@@ -54,7 +54,7 @@ public class NPCSystem : MonoBehaviour, IInteractable
 
     public void EndDialogue()
     {
-        player.GetComponent<ThirdPersonController>().enabled = true; //enables player movement
+        player.GetComponent<PlayerController>().enabled = true; //enables player movement
         StopAllCoroutines();
         dialoguePanel.SetActive(false);
         dialogueText.text = "";

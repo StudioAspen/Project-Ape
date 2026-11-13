@@ -18,7 +18,6 @@ public class ThirdPersonController : MonoBehaviour
     #region Variables
     [Header("Camera")]
     public Transform cameraTransform; //The Camera pivot goes here in editor
-    private float lockOnSpeed = 10f;
     
 
     [Header("Jumping")]
@@ -58,21 +57,7 @@ public class ThirdPersonController : MonoBehaviour
     [Header("Roll")]
     public float rollDash = 25f;
     public float rollDuration = 0.2f;
-
-    [Header("Combat")]
-    public GameObject TempSpear;
-    public Transform attackPoint;
-    private InputAction m_throw;
-    public float throwCooldown;
-    public float throwForce;
-    public float throwUpwardForce;
-    public string enemyTag = "Enemy";
-    private InputAction m_aim;
-    public bool readyToThrow;
-    bool lockOnEnabled;
-    private float lockOnRange = 20f;
-    private float spearHeightOffset = 5.5f;
-    private CombatComponent combat;
+    
     
    
 
@@ -155,7 +140,6 @@ public class ThirdPersonController : MonoBehaviour
 
     void Awake()
     {
-        readyToThrow = true; //throw is ready at the start
         controller = GetComponent<CharacterController>(); //Start taking information from controller input
         inputActions = new PlayerInput();
         
@@ -169,9 +153,6 @@ public class ThirdPersonController : MonoBehaviour
         Debug.Log(spinTimeout);
 
         checkpointPos = transform.position; //added
-        
-        
-        combat = GetComponent<CombatComponent>();
 
     }
 

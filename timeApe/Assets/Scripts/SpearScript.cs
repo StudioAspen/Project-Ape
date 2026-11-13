@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -43,7 +44,7 @@ public class SpearScript : MonoBehaviour
         spearRb.isKinematic = true; 
 
         EnemyBehavior enemyComponent = collision.gameObject.GetComponent<EnemyBehavior>(); // gets information of any enemy with the enemy script
-        StartCoroutine(Waiter());
+        StartCoroutine(Waiter(5));
 
         if (enemyComponent != null && !isPulling)
         {   
@@ -84,14 +85,17 @@ public class SpearScript : MonoBehaviour
 
     }
     
-    IEnumerator Waiter()
+       IEnumerator Waiter(int time)
     {
-        yield return new WaitForSeconds(3);
+        time = 5;
+        yield return new WaitForSeconds(time);
         Object.Destroy(this.gameObject);
     }
     
+    
      void FixedUpdate()
     {
+        StartCoroutine(Waiter(10));
         if (isPulling && targetEnemyTransform != null && playerTransform != null)
         {
             pullTimer += Time.deltaTime;
@@ -133,7 +137,6 @@ public class SpearScript : MonoBehaviour
             }
         }
 
-        
     }
 }
 

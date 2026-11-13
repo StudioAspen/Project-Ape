@@ -48,6 +48,7 @@ public class EnemyAI : MonoBehaviour
             Debug.Log("Enemy attacks!");
             alreadyAttacked = true;
             Invoke(nameof(ResetAttack), timeBetweenAttacks);
+
         }
     }
 

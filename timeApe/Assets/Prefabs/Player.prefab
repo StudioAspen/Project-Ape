@@ -1689,7 +1689,9 @@ PrefabInstance:
       value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6032894850172988775, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
+    - {fileID: 7159577615910513288, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 4487558115815528367, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
       insertIndex: 0
@@ -1698,29 +1700,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6853331880315779826, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6769473502191061455}
-    - targetCorrespondingSourceObject: {fileID: 7159577615910513288, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2374892875268983580}
   m_SourcePrefab: {fileID: 100100000, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
---- !u!1 &1936230099883026936 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7159577615910513288, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
-  m_PrefabInstance: {fileID: 8756461043726500720}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &2374892875268983580
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1936230099883026936}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86c6556701af9e04380698b89f691b6e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FMODUnity::FMODUnity.StudioListener
-  nonRigidbodyVelocity: 0
-  attenuationObject: {fileID: 0}
 --- !u!4 &2360449263192638994 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6433166623560123746, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}
@@ -1746,15 +1726,15 @@ MonoBehaviour:
   TempSpear: {fileID: 5411153516361462090, guid: 4c5bc698c003d1746bfe8fb00589228d, type: 3}
   attackPoint: {fileID: 2551325464611289570}
   target: {fileID: 0}
+  cameraTransform: {fileID: 2360449263192638994}
   throwForce: 20
   throwCooldown: 1
   throwUpwardForce: 0
   spearHeightOffset: 5.5
+  readyToThrow: 0
   enemyTag: Enemy
-  cameraTransform: {fileID: 2360449263192638994}
   lockOnSpeed: 10
   lockOnRange: 20
-  readyToThrow: 0
 --- !u!4 &5170748891066684639 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4487558115815528367, guid: a94efac50ffe3c247aa1c14b4d8bebc1, type: 3}

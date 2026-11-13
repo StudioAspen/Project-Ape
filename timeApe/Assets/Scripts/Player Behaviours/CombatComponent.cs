@@ -23,7 +23,6 @@ public class CombatComponent : MonoBehaviour
     // input actions
     private InputAction m_throw;
     private InputAction m_aim;
-    private PlayerInput inputAction;
 
     
     void Awake()
@@ -33,13 +32,8 @@ public class CombatComponent : MonoBehaviour
         InvokeRepeating("EnemyCheck", 0, 0.5f);
         m_throw = InputSystem.actions.FindAction("Throw");
         m_aim = InputSystem.actions.FindAction("Aim");
-        inputAction = new PlayerInput();
     }
 
-    void OnEnable()
-    {
-        inputAction.Enable();
-    }
     void Update()
     {
         

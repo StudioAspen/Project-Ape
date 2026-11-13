@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
 {
     #region Variables
     [Header("Camera")]
-    private PlayerCamera cam;
+    public Camera cam;
 
     [Header("Jumping")]
     public float coyoteTimer = 0.2f;
@@ -132,6 +132,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 moveDirection;
     private Vector3 lastMoveDirection;
     private Vector3 launchDirection;
+    private Vector2 lookInput;
     private Vector3 rollDirection;
     private MeshRenderer mesh;
     #endregion
@@ -145,7 +146,7 @@ public class PlayerController : MonoBehaviour
     {
         controller = GetComponent<CharacterController>(); //Start taking information from controller input
         inputActions = new PlayerInput();
-        cam = gameObject.AddComponent<PlayerCamera>();
+        //cam = FindAnyObjectByType<Camera>();
 
         /*
         //audio variables
@@ -169,6 +170,9 @@ public class PlayerController : MonoBehaviour
         //Connecting Sprint Alternative for Keyboard
         inputActions.Player.Sprint.performed += ctx => walker = true;
         inputActions.Player.Sprint.canceled += ctx => walker = false;
+
+        /*inputActions.Player.Look.performed += ctx => lookInput = ctx.ReadValue<Vector2>();
+        inputActions.Player.Look.canceled += ctx => lookInput = Vector2.zero;*/
 
         //Connecting Jump press
         inputActions.Player.Jump.performed += ctx =>
@@ -260,8 +264,8 @@ public class PlayerController : MonoBehaviour
 
     Vector3 MoveDirect() //RESPONSIBLE OF HORIZONTAL MOVEMENT
     {
-        Vector3 forward = cam.cameraTransform.transform.forward;
-        Vector3 right = cam.cameraTransform.transform.right;
+        Vector3 forward = cam.transform.forward;
+        Vector3 right = cam.transform.right;
 
         forward.y = 0f;
         right.y = 0f;

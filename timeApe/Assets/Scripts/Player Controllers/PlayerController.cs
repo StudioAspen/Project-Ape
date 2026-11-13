@@ -68,11 +68,11 @@ public class ThirdPersonController : MonoBehaviour
     public float throwUpwardForce;
     public string enemyTag = "Enemy";
     private InputAction m_aim;
-    bool readyToThrow;
+    public bool readyToThrow;
     bool lockOnEnabled;
     private float lockOnRange = 20f;
-    public Transform target;
     private float spearHeightOffset = 5.5f;
+    private CombatComponent combat;
     
    
 
@@ -103,7 +103,7 @@ public class ThirdPersonController : MonoBehaviour
 
     //private variables
     private bool isSkidding;
-    private bool jumped;
+    public bool jumped;
     private bool jumpHold;
     private bool walker;
     private bool isSpinning = false;
@@ -158,8 +158,7 @@ public class ThirdPersonController : MonoBehaviour
         readyToThrow = true; //throw is ready at the start
         controller = GetComponent<CharacterController>(); //Start taking information from controller input
         inputActions = new PlayerInput();
-        m_throw = InputSystem.actions.FindAction("Throw");
-        m_aim = InputSystem.actions.FindAction("Aim");
+        
 
         //audio variables
         FootstepsSound = FMODUnity.RuntimeManager.CreateInstance(FootstepEvent);
@@ -171,7 +170,9 @@ public class ThirdPersonController : MonoBehaviour
 
         checkpointPos = transform.position; //added
         
-        InvokeRepeating("EnemyCheck", 0f, 0.5f); // this is for the enemy check, it calculates distance so this is a safety measure for performance
+        
+        combat = GetComponent<CombatComponent>();
+
     }
 
     void OnEnable()
@@ -264,10 +265,7 @@ public class ThirdPersonController : MonoBehaviour
             
         }
 
-        if(m_throw.WasPressedThisFrame() && readyToThrow) // throws spear
-        {
-            Attack();
-        }
+        
 
 
         DetectSpin();
@@ -277,10 +275,7 @@ public class ThirdPersonController : MonoBehaviour
             Respawn();
         }
 
-        if (target == null)
-        {
-            return;
-        }
+
 
         //for updating checkpoint position when player reaches a new one
         // if (#touching checkpoint)
@@ -568,10 +563,7 @@ public class ThirdPersonController : MonoBehaviour
         cameraTransform.localRotation =
             Quaternion.Euler(verticalLookRotation, 0f, 0f);
 
-        if(m_aim.IsPressed() && target != null) // applies to the camera rotation so fits here more than the update function
-        {
-           CameraLockOn(); // handles the camera lock on
-        }
+        
     }
 
 
@@ -682,103 +674,6 @@ public class ThirdPersonController : MonoBehaviour
             velocity.z = 0f;
             Airlock = true;
         }
-    }
-
-    private void Attack() // SHOOTS SPEAR
-    {
-
-        readyToThrow = false; //so it cannot be spammed
-        GameObject spear = Instantiate(TempSpear, attackPoint.position, cameraTransform.rotation); //this is what creates the spear at the attackpoint
-        Rigidbody spearRb = spear.GetComponent<Rigidbody>(); //this grabs the rigidbody component of the spear
-        SpearScript spearScript = spear.GetComponent<SpearScript>();
-
-        Vector3 forceDirection = cameraTransform.transform.forward;
-        RaycastHit hit;
-
-
-
-        
-        if (Physics.Raycast(cameraTransform.position,cameraTransform.forward, out hit, 500f, 8)) // using raycast for more accurate shooting outside the lock-on
-        {
-            forceDirection = (hit.point - attackPoint.position).normalized;
-        }
-        
-        Invoke(nameof(ResetThrow), throwCooldown); // starts resetthrow function in whatever time is set for throwcooldown
-
-        if (spearScript != null)
-        {
-            spearScript.Initialize(this.transform);
-        }
-        
-        if (jumped)
-        {
-            
-            spearRb.useGravity = true;
-        }
-        else
-        {
-            spearRb.useGravity = false;
-        }
-        if (target != null)
-        {
-            Vector3 dir = (target.position - attackPoint.position).normalized * throwForce + (Vector3.up * spearHeightOffset);
-            Quaternion lookRotation = Quaternion.LookRotation(dir);
-            Vector3 rotation = lookRotation.eulerAngles;
-            spearRb.rotation = lookRotation;
-            
-            spearRb.AddForce(dir,ForceMode.Impulse);
-
-        }
-        else
-        {
-            Vector3 forceToAdd = forceDirection * throwForce + transform.up * throwUpwardForce; //force for the spear's rigidbody
-            spearRb.AddForce(forceToAdd, ForceMode.Impulse);
-        }
-    }
-
-    private void ResetThrow() //resets the throw
-    {
-        readyToThrow = true;
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        //for testing the range of the lock on
-        //Gizmos.color = Color.red;
-        //Gizmos.DrawWireSphere(transform.position, lockOnRange);
-    }
-
-    void EnemyCheck()
-    {   
-
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag(enemyTag); // grabs gameobjects with enemy tag
-        float shortestDistance = Mathf.Infinity;
-        GameObject nearestEnemy = null;
-
-        foreach (GameObject enemy in enemies)
-        {
-            float distanceToEnemy = Vector3.Distance(transform.position, enemy.transform.position);
-            if (distanceToEnemy < shortestDistance) // calculates the closest enemy
-            {
-                shortestDistance = distanceToEnemy;
-                nearestEnemy = enemy;
-            }
-        }
-        if (nearestEnemy != null && shortestDistance <= lockOnRange)
-        {
-            target = nearestEnemy.transform; //assigns target from the result of the above if statement and can be used anywhere on this script
-        }
-        else
-        {
-            target = null;
-        }
-    }
-
-    void CameraLockOn()
-    {
-        Vector3 aimDir = (target.position - transform.position).normalized;
-        Quaternion rotation = Quaternion.LookRotation(aimDir);
-        cameraTransform.rotation = Quaternion.Lerp(cameraTransform.rotation,rotation,lockOnSpeed);
     }
     #endregion
 

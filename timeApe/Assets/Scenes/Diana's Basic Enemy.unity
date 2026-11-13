@@ -418,6 +418,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 6769473502191061455, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+      propertyPath: spearHeightOffset
+      value: 2.5
+      objectReference: {fileID: 0}
     - target: {fileID: 7475341436621468915, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       propertyPath: m_Layer
       value: 6

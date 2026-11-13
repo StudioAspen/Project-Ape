@@ -263,8 +263,20 @@ PrefabInstance:
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 902052519996820736, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+      propertyPath: throwForce
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 902052519996820736, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       propertyPath: acceleration
       value: 118.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 902052519996820736, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+      propertyPath: throwCooldown
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 902052519996820736, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
+      propertyPath: throwUpwardForce
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 902052519996820736, guid: 1f1709056ffa52a4e8e7047b2eb430c3, type: 3}
       propertyPath: wallJumpVertical
@@ -469,10 +481,13 @@ PrefabInstance:
       value: Basic_Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 2872941025822876608, guid: a37ab067cdac94645b442491a5c23998, type: 3}
+<<<<<<< HEAD
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2872941025822876608, guid: a37ab067cdac94645b442491a5c23998, type: 3}
+=======
+>>>>>>> b7fb2fdd (Attempt at adding enemy stun function.)
       propertyPath: m_TagString
       value: Enemy
       objectReference: {fileID: 0}
@@ -557,12 +572,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 9100000, guid: a3698af881b5b54448e3133b2d140a6d, type: 2}
     - target: {fileID: 8004189221431469617, guid: a37ab067cdac94645b442491a5c23998, type: 3}
+<<<<<<< HEAD
       propertyPath: m_Height
       value: 2.6468782
       objectReference: {fileID: 0}
     - target: {fileID: 8004189221431469617, guid: a37ab067cdac94645b442491a5c23998, type: 3}
       propertyPath: m_Center.y
       value: 1.3234391
+=======
+      propertyPath: m_IsTrigger
+      value: 1
+>>>>>>> b7fb2fdd (Attempt at adding enemy stun function.)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

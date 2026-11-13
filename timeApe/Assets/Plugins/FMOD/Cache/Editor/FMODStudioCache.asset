@@ -180,7 +180,7 @@ MonoBehaviour:
   Path: FMOD/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 639267405750718340
+  lastModified: 639276938787773940
   FileSizes:
   - Name: 
     Value: 934
@@ -212,3 +212,90 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 585
+<<<<<<< HEAD
+=======
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d32cf7c32a3ed8347bac48ef5ed56d82, type: 3}
+  m_Name: FMODStudioCache
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EventCache
+  EditorBanks:
+  - {fileID: -7750169945782255663}
+  - {fileID: 8450534488461127086}
+  EditorEvents:
+  - {fileID: -350726665423589855}
+  - {fileID: -2780914825223372233}
+  - {fileID: 1079734907169960274}
+  - {fileID: -1932388479168874319}
+  - {fileID: -3226708124315534131}
+  EditorParameters: []
+  MasterBanks:
+  - {fileID: 8450534488461127086}
+  StringsBanks:
+  - {fileID: -7750169945782255663}
+  cacheVersion: 131860
+  cacheTime: 639276938787773940
+  SerializableEventsDict:
+  - key: event:/Skid
+    index: 0
+  - key: event:/Roll
+    index: 1
+  - key: event:/Jump
+    index: 2
+  - key: event:/Footsteps
+    index: 3
+  - key: event:/Spin
+    index: 4
+--- !u!114 &1079734907169960274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Jump
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Jump
+  Guid:
+    Data1: -19855553
+    Data2: 1192498274
+    Data3: 1318516132
+    Data4: -2041523303
+  Banks:
+  - {fileID: 8450534488461127086}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 1500
+--- !u!114 &8450534488461127086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.bank
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorBankRef
+  Path: FMOD/Desktop/Master.bank
+  Name: Master
+  StudioPath: bank:/Master
+  lastModified: 639276938787728687
+  FileSizes: []
+  Exists: 1
+>>>>>>> b7fb2fdd (Attempt at adding enemy stun function.)

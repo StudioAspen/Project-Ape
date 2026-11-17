@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -16,11 +17,13 @@ public class SpearScript : MonoBehaviour
     private Vector3 targetDestination;
     private Vector3 enemyStartPosition;
     private Quaternion enemyStartRotation;
+    private Vector3 threadZipDestination;
+    private bool targetHit;
     private float offset = 5f;
     private float heightOffset = 2.0f;
     private bool isPulling;
     private float pullTimer = 0f;
-    private float duration = 0.7f;
+    private float duration = 1f;
 
     AnimationCurve curve = new AnimationCurve(
         new Keyframe(0f, 0f, 0f, 0f),
@@ -40,11 +43,16 @@ public class SpearScript : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {   
+        targetHit = true;
         Rigidbody spearRb = GetComponent<Rigidbody>();
         spearRb.isKinematic = true; 
 
         EnemyBehavior enemyComponent = collision.gameObject.GetComponent<EnemyBehavior>(); // gets information of any enemy with the enemy script
         StartCoroutine(Waiter(5));
+
+        threadZipDestination = spearRb.position;
+        
+        Debug.Log(threadZipDestination);
 
         if (enemyComponent != null && !isPulling)
         {   
@@ -99,11 +107,8 @@ public class SpearScript : MonoBehaviour
         if (isPulling && targetEnemyTransform != null && playerTransform != null)
         {
             pullTimer += Time.deltaTime;
-
             float t = pullTimer / duration;
-            
             t = Mathf.Clamp01(t);
-
             float value = curve.Evaluate(t);
 
             Vector3 newPosition = Vector3.Lerp(enemyStartPosition, targetDestination, value);
@@ -135,8 +140,20 @@ public class SpearScript : MonoBehaviour
 
                 Destroy(gameObject);
             }
+        } else if (targetHit == true)
+        {
+            pullTimer += Time.deltaTime;
+            float t = pullTimer / duration;
+            t = Mathf.Clamp01(t);
+            float value = curve.Evaluate(t);
+
+            Vector3 newThreadZipLocation = Vector3.Lerp(playerTransform.position,threadZipDestination,value);
+            
+            playerTransform.position = newThreadZipLocation;
+            targetHit = false;
         }
 
     }
+    
 }
 

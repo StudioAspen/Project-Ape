@@ -106,8 +106,9 @@ public class Trigger : MonoBehaviour
     private bool cutsceneStarted;
     private bool cameraAnimationFinished;
     private bool kSequenceRunning;
-    private bool originalObjectsHidden;
     private bool playFirstKSetNext = true;
+    // Remembers the Day/Night selection that was active when Y opened the portal sequence.
+    private bool selectionBeforePortal = true;
     private bool galaxyTransitionStarted;
 
     // Tracks every collider belonging to the player so one collider leaving
@@ -569,6 +570,10 @@ public class Trigger : MonoBehaviour
         if (sequenceRunning)
             yield break;
 
+        // Save the environment that was selected before entering the portal menu.
+        // B will restore this exact selection, even if the player switches Day/Night.
+        selectionBeforePortal = playFirstKSetNext;
+
         sequenceRunning = true;
         cutsceneStarted = true;
 
@@ -709,26 +714,14 @@ public class Trigger : MonoBehaviour
 
         kSequenceRunning = true;
 
-        // Hide the original scene objects only on the first K press.
-        if (!originalObjectsHidden)
-        {
-            if (objectsToHideWhenKPressed != null)
-            {
-                foreach (GameObject objectToHide in objectsToHideWhenKPressed)
-                {
-                    if (objectToHide != null)
-                        objectToHide.SetActive(false);
-                }
-            }
-
-            originalObjectsHidden = true;
-        }
-
         float longestAnimationDuration;
 
         if (playFirstKSetNext)
         {
-            // FIRST K: original animations + nighttime skybox.
+            // FIRST K: switch from daytime to nighttime.
+            // Hide the daytime/original scene assets while the nighttime
+            // animation and environment are being shown.
+            SetOriginalSceneObjectsActive(false);
             SetAnimationObjectsActive(reverseAnimatedObjectsToActivateWhenKPressed, false);
             longestAnimationDuration =
                 ActivateAndPlayAnimationSet(animatedObjectsToActivateWhenKPressed);
@@ -738,7 +731,9 @@ public class Trigger : MonoBehaviour
         }
         else
         {
-            // SECOND K: reverse animations + daytime skybox.
+            // SECOND K: switch from nighttime back to daytime.
+            // Restore the original daytime scene assets.
+            SetOriginalSceneObjectsActive(true);
             SetAnimationObjectsActive(animatedObjectsToActivateWhenKPressed, false);
             longestAnimationDuration =
                 ActivateAndPlayAnimationSet(reverseAnimatedObjectsToActivateWhenKPressed);
@@ -847,6 +842,18 @@ public class Trigger : MonoBehaviour
 
         RenderSettings.skybox = skyboxMaterial;
         DynamicGI.UpdateEnvironment();
+    }
+
+    private void SetOriginalSceneObjectsActive(bool active)
+    {
+        if (objectsToHideWhenKPressed == null)
+            return;
+
+        foreach (GameObject originalObject in objectsToHideWhenKPressed)
+        {
+            if (originalObject != null)
+                originalObject.SetActive(active);
+        }
     }
 
     private void SetNighttimeObjectsActive(bool active)
@@ -1527,4 +1534,134 @@ public class Trigger : MonoBehaviour
             }
         }
     }
+
+    // =========================================================
+    // CONTROLLER INPUT BRIDGES
+    // =========================================================
+
+    // Xbox Y / PS5 Triangle: Start the portal camera sequence.
+    public void ControllerOpenPortal()
+    {
+        if (playerInsideTrigger &&
+            !moving &&
+            !sequenceRunning &&
+            !cutsceneStarted)
+        {
+            StartCoroutine(BeginCameraSequence());
+        }
+    }
+
+    // Xbox D-pad / Left Stick / PS5 D-pad / Left Stick:
+    // Switch between the day and night sequences.
+    public void ControllerSwitchDayNight()
+    {
+        if (cameraAnimationFinished &&
+            !kSequenceRunning &&
+            !galaxyTransitionStarted)
+        {
+            StartCoroutine(PlayKKeySequence());
+        }
+    }
+
+    // Xbox A / PS5 Cross: Confirm and enter the selected environment.
+    public void ControllerConfirm()
+    {
+        if (cameraAnimationFinished &&
+            !kSequenceRunning &&
+            !galaxyTransitionStarted)
+        {
+            StartCoroutine(FinishGalaxyTransition());
+        }
+    }
+
+    // Keyboard B / Xbox B / PS5 Circle: Leave the selection sequence and
+    // return to the portal-ready state from before Y was pressed.
+    // Do not reset playFirstKSetNext: it stores the currently selected
+    // Day/Night environment, which must remain selected after backing out.
+    public void ControllerBack()
+    {
+        // Back is available after the camera sequence has finished and while
+        // the player is choosing Day/Night. It cannot interrupt an animation
+        // set or the final galaxy transition.
+        if (!cameraAnimationFinished || kSequenceRunning || galaxyTransitionStarted)
+            return;
+
+        if (animationCleanupCoroutine != null)
+        {
+            StopCoroutine(animationCleanupCoroutine);
+            animationCleanupCoroutine = null;
+        }
+
+        // Stop and reset the cutscene camera animation.
+        if (cameraAnimator != null)
+        {
+            cameraAnimator.enabled = false;
+            cameraAnimator.Rebind();
+            cameraAnimator.Update(0f);
+        }
+
+        // Hide the cutscene camera and restore the first-person camera.
+        if (animationCamera != null)
+        {
+            animationCamera.enabled = false;
+            animationCamera.gameObject.SetActive(false);
+        }
+
+        if (firstPersonCamera != null)
+        {
+            firstPersonCamera.gameObject.SetActive(true);
+            firstPersonCamera.enabled = true;
+        }
+
+        if (sphere != null)
+            sphere.SetActive(false);
+
+        if (galaxyFadeAnimator != null)
+        {
+            galaxyFadeAnimator.enabled = false;
+            galaxyFadeAnimator.gameObject.SetActive(false);
+        }
+
+        // Restore the Day/Night environment that was active before Y was pressed.
+        // playFirstKSetNext == true means daytime is selected; false means nighttime.
+        playFirstKSetNext = selectionBeforePortal;
+
+        bool restoreNighttime = !selectionBeforePortal;
+        SetSkybox(restoreNighttime ? nightSkyboxMaterial : daySkyboxMaterial);
+        SetNighttimeObjectsActive(restoreNighttime);
+
+        // Restore the matching scene assets as well as the skybox.
+        // Daytime uses the original objects; nighttime hides them.
+        SetOriginalSceneObjectsActive(!restoreNighttime);
+
+        // Stop either preview animation set so no objects from the abandoned
+        // selection remain visible after returning to the portal-ready state.
+        SetAnimationObjectsActive(animatedObjectsToActivateWhenKPressed, false);
+        SetAnimationObjectsActive(reverseAnimatedObjectsToActivateWhenKPressed, false);
+
+        // Restore the portal's ready effects and player controls.
+        SetVFX(true);
+        if (shakeScript != null)
+            shakeScript.enabled = true;
+
+        SetPlayerControl(true);
+
+        sequenceRunning = false;
+        cutsceneStarted = false;
+        cameraAnimationFinished = false;
+        galaxyTransitionStarted = false;
+        moving = false;
+
+        // The trigger was disabled when the camera sequence completed.
+        // Re-enable it and keep the existing player-overlap state intact.
+        Collider[] triggerColliders = GetComponents<Collider>();
+        foreach (Collider triggerCollider in triggerColliders)
+        {
+            if (triggerCollider != null && triggerCollider.isTrigger)
+                triggerCollider.enabled = true;
+        }
+
+        SetPromptVisible(playerInsideTrigger);
+    }
+
 }

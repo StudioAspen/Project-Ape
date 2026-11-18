@@ -57,9 +57,9 @@ Material:
     m_Floats:
     - _BUILTIN_QueueControl: -1
     - _BUILTIN_QueueOffset: 0
-    - _NoiseContrast: 0.088
-    - _NoiseSpace: 2.26
-    - _NoiseSpeed: 0.2
+    - _NoiseContrast: 0.05
+    - _NoiseSpace: 2.9
+    - _NoiseSpeed: 0.27
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Ripple: 1

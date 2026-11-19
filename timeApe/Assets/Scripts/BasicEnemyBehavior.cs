@@ -6,24 +6,23 @@ public class EnemyBehavior : MonoBehaviour
     public Transform goal;
     public NavMeshAgent agent;
     private Transform self_pos;
-    private CapsuleCollider self_collision;
 
     private float normal_speed;
     private float normal_acceleration;
 
-    private bool isAttacking = false;
+    public bool isAttacking = false;
     private Vector3 attack_position = Vector3.zero;
-    private float attack_range;
+    private float attack_range = 3;
     [SerializeField] public int detect_range = 15;
     [SerializeField] public float attack_cooldown = 0.5f;
     [SerializeField] public int lunge_speed = 10;
-    private bool isLunging = false;
+    public bool isLunging = false;
 
-    private bool isStunned = false;
+    public bool isStunned = false; // This variable is used to check if the enemy is stunned so that the other things can't happen. 
     private float stun_cooldown = 2.0f;
 
 
-    private bool isLoitering = false;
+    public bool isLoitering = false;
     private Vector3 Loitering_destination = Vector3.zero;
     [SerializeField] public float loitering_radius = 5;
     [SerializeField] public float loitering_speed = 0.8f;
@@ -32,9 +31,8 @@ public class EnemyBehavior : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         self_pos = GetComponent<Transform>();
-        self_collision = GetComponent<CapsuleCollider>();
+        goal = GameObject.FindGameObjectWithTag("Player").transform;
 
-        attack_range = 3;
         normal_speed = agent.speed;
         normal_acceleration = agent.acceleration;
     }
@@ -71,34 +69,20 @@ public class EnemyBehavior : MonoBehaviour
                 agent.acceleration = normal_acceleration;
             }
         }
-        else if (self_collision.CompareTag("Player") && !isAttacking)
+        else if (isStunned && !IsInvoking(nameof(Recover)))
         {
-            Invoke(nameof(OnTriggerEnter), 0.5f);
-        }
-        else if (isStunned)
-        {
+            agent.isStopped = true;
+            agent.destination = self_pos.position;
+            agent.speed = normal_speed;
+            agent.acceleration = normal_acceleration;
             Invoke(nameof(Recover), stun_cooldown);
-        }
-    }
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            Debug.Log("Owie!");
-            isStunned = true;
-            isAttacking = false;
-            isLunging = false;
-            isLoitering = false;
-            agent.acceleration = 100;
-            agent.speed = 0;
         }
     }
     void Recover()
     {
         Debug.Log("Recovered!");
         isStunned = false;
-        agent.speed = normal_speed;
-        agent.acceleration = normal_acceleration;
+        agent.isStopped = false;
     }
     
     void Chasing()
@@ -112,7 +96,7 @@ public class EnemyBehavior : MonoBehaviour
         self_pos.LookAt(goal);
         Debug.Log($"Distance: {Vector3.Distance(self_pos.position, goal.position)}, attack range: {attack_range}");
 
-        if (Vector3.Distance(self_pos.position, goal.position) <= attack_range && !isAttacking && !isStunned)
+        if (Vector3.Distance(self_pos.position, goal.position) <= attack_range && !isAttacking && !isStunned && !IsInvoking(nameof(Attack)))
         {
             Debug.Log("Attack!");
             isAttacking = true;
@@ -131,7 +115,7 @@ public class EnemyBehavior : MonoBehaviour
             attack_position = self_pos.forward * rayHit.distance;
         }
 
-        if (NavMesh.SamplePosition(self_pos.position + attack_position, out NavMeshHit navHit, attack_range, NavMesh.AllAreas) && Vector3.Distance(self_pos.position, goal.position) <= (attack_range * 1.5f))
+        if (NavMesh.SamplePosition(self_pos.position + attack_position, out NavMeshHit navHit, attack_range, NavMesh.AllAreas) && Vector3.Distance(self_pos.position, goal.position) <= (attack_range * 2f))
         {
             Debug.Log("Enemy Bites");
             agent.acceleration = 100;

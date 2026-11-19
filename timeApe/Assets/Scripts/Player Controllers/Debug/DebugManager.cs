@@ -13,7 +13,7 @@ public class DebugManager : MonoBehaviour
     private Gamepad controller;
 
     [Header("Component References")]
-    private PlayerController player;
+    public PlayerController player;
 
     void Start()
     {

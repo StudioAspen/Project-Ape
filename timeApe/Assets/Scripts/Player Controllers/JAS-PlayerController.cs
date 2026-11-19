@@ -614,36 +614,47 @@ public class JASPlayerController : MonoBehaviour
         if (rollState) return; //prevent user input from spamming.
         if (Airlock) return; // Only one air dash
 
+        if (isBackflipping)
+        {
+            rollDirection = backflipDirection;
+        }
+        else if (moveInput.magnitude > deadZone && !Airlock) //checks that the player is actually moving towards somewhere, preventing mistriggers with no input
+        {
+            rollDirection = MoveDirect();
+        }
+        else
+        {
+            Vector3 facing = modelTransform.forward;
+            facing.y = 0f;
+            rollDirection = facing.normalized;
+        }
+
         rollTimer = rollDuration; //starts the roll
         rollState = true; //tells roll() in update to run properly.
     }
 
     void Roll() //PERFORMS THE ACTUAL ROLL
     {
-        if (controller.isGrounded) // Airlock permits player to only roll once middair, preventing infinite spam.
+        if (controller.isGrounded || IsGrounded()) // Airlock permits player to only roll once middair, preventing infinite spam.
         {
             Airlock = false;
         }
         if (!rollState) return;
 
-        launchDirection = MoveDirect();
         rollTimer -= Time.deltaTime;
+        velocity.x = rollDirection.x * rollDash;
+        velocity.z = rollDirection.z * rollDash;
 
-        if(isBackflipping)
-        {
-            velocity = backflipDirection * rollDash;
-        }
-        else if (moveInput.magnitude > deadZone && !Airlock) //checks that the player is actually moving towards somewhere, preventing mistriggers with no input
-        {
-            velocity = launchDirection * rollDash;
-        }
 
         if (rollTimer <= 0f) //once the roll is over, reset everything and activate Airlock if the player hasn't hit the ground,
         {
             rollState = false;
-            velocity.x = 0f;
-            velocity.z = 0f;
-            Airlock = true;
+            if(true)
+            {
+                velocity.x = 0f;
+                velocity.z = 0f;
+            }
+            Airlock = !controller.isGrounded;
         }
     }
     #endregion

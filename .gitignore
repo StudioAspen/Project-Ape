@@ -120,4 +120,5 @@ timeApe/Documentation/_site/
 ## .meta files from Wwise (or FMOD if Audio team uses it) may have to be added.
 ## EX 1: charonsCorner/Assets/Art/models/props/abstract_simple_humanoid/abstract_simple_humanoid.fbx.meta
 ## EX 2: charonsCorner/Assets/Art/models/props/beads_1/beads_1.fbx.meta
+timeApe\Assets\Plugins\FMOD\Cache\Editor\FMODStudioCache.asset
 

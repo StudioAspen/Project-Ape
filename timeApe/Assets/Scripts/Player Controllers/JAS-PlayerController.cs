@@ -37,6 +37,9 @@ public class JASPlayerController : MonoBehaviour
     public float wallJumpVertical = 15f;
     public float wallFrictionAmount = -0.95f;
     public float wallFrictionTime = 0.2f;
+    [Range(0f, 1f)] public float wallFrictionStrength = 0.95f;
+    public float wallFricitionFallSpeed = -3f;
+    public float wallSlideSpeed = -2f;
 
     [Header("Movement")]
     public Transform modelTransform; //The Character Model Goes here in the editor
@@ -233,6 +236,8 @@ public class JASPlayerController : MonoBehaviour
         {
             StartCheckWall();
         }
+        else
+            isTouchingWall = false;
     }
 
     void MoveDirectCheck()
@@ -361,32 +366,43 @@ public class JASPlayerController : MonoBehaviour
             jumped = false;
         }
 
+        // wall friction: slide for a short window
+        float gravityScale = 1f;
+
         //this implements the cut in jumping for variable jump
-        if (velocity.y > 0f && !jumpHold)
+        /* if (velocity.y > 0f && !jumpHold)
         {
             velocity.y += gravity * Time.deltaTime * jumpRelease;
         }
         else
         {
             velocity.y += gravity * Time.deltaTime;
-        }
+        } */
 
-        if (isTouchingWall && velocity.y < -3f)
+        bool sliding = isTouchingWall && !controller.isGrounded && velocity.y < 0f;
+
+        if (sliding)
         {
-            wallFrictionTimer -= Time.deltaTime;
-            velocity.y += gravity * wallFriction * Time.deltaTime;
-
-            if (wallFrictionTimer < 0f)
+            if(wallFrictionTimer > 0f)
             {
-                wallFriction = 1f;
-                return;
+                wallFrictionTimer -= Time.deltaTime;
+                gravityScale = 1f - wallFrictionStrength;
+                velocity.y = Mathf.Max(velocity.y, wallSlideSpeed);
             }
         }
         else
         {
             wallFrictionTimer = wallFrictionTime;
-            wallFriction = wallFrictionAmount;
         }
+
+        float g = gravity;
+
+        if (velocity.y > 0f && !jumpHold)
+            g *= jumpRelease;
+        else
+            g *= gravityScale;
+
+        velocity.y += g * Time.deltaTime;
     }
 
     void Jump() //HANDLES CHANGES IN VERTICAL SPEED CAUSED BY JUMPING

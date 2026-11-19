@@ -8,7 +8,7 @@ public class CombatComponent : MonoBehaviour
     [Header("References")]
     public GameObject TempSpear;
     public Transform attackPoint;
-    public Transform target;
+    public Transform target; //debug dont add anything to this, this is for detecting enemies and seeing if it works
     public Transform cameraTransform;
     [Header("Throwing Stats")]
     public float throwForce;

@@ -23,7 +23,7 @@ public class EnemyBehavior : MonoBehaviour
 
 
     public bool isLoitering = false;
-    private Vector3 Loitering_destination = Vector3.zero;
+    private Vector3 Loitering_destination;
     [SerializeField] public float loitering_radius = 5;
     [SerializeField] public float loitering_speed = 0.8f;
 
@@ -35,7 +35,7 @@ public class EnemyBehavior : MonoBehaviour
 
         normal_speed = agent.speed;
         normal_acceleration = agent.acceleration;
-        isLoitering = true;
+        Loitering_destination = self_pos.position;
     }
 
     // Update is called once per frame

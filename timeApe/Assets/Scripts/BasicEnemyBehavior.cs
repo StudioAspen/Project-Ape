@@ -35,6 +35,7 @@ public class EnemyBehavior : MonoBehaviour
 
         normal_speed = agent.speed;
         normal_acceleration = agent.acceleration;
+        isLoitering = true;
     }
 
     // Update is called once per frame
